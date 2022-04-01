@@ -76,9 +76,11 @@ public class Main {
     static List<Customer> customersDatabase(){
         Set<Loan> loans1 = new HashSet<>();
         Customer customer1 = new Customer("Maria", "Ionescu", "maria.ionescu@gmail.com", "mariapa55", 1, loans1, "Adresa 1");
+        Customer customer2 = new Customer("Ion", "cristea", "ic", "pa55", 1, loans1, "Adresa 3");
 
         List<Customer> customers = new ArrayList<>();
         customers.add(customer1);
+        customers.add(customer2);
 
         return customers;
     }

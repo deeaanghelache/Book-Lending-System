@@ -3,8 +3,6 @@ package entity.bookType;
 import entity.category.Category;
 import entity.category.Subcategory;
 
-import java.util.Comparator;
-
 public class Audiobook extends BookType{
     private static int audiobookNumber = 1;
     private int duration;
@@ -30,7 +28,8 @@ public class Audiobook extends BookType{
                 "\n\t\t -> availability = " + availability +
                 "\n\t\t -> category = " + category +
                 "\n\t\t -> subcategory = " + subcategory +
-                "\n\t\t -> duration = " + duration;
+                "\n\t\t -> duration = " + duration +
+                "\n\t\t -> reviews: " + reviews;
     }
 
     public int getDuration() {

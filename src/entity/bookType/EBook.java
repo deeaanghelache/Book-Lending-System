@@ -3,8 +3,6 @@ package entity.bookType;
 import entity.category.Category;
 import entity.category.Subcategory;
 
-import java.util.Comparator;
-
 public class EBook extends BookType {
     private static int ebooksNumber = 1;
     private int numberOfPages;
@@ -34,7 +32,8 @@ public class EBook extends BookType {
                 "\n\t\t -> category = " + category +
                 "\n\t\t -> subcategory = " + subcategory +
                 "\n\t\t -> numberOfPages = " + numberOfPages +
-                "\n\t\t -> format = " + format;
+                "\n\t\t -> format = " + format +
+                "\n\t\t -> reviews: " + reviews;
     }
 
     public int getNumberOfPages() {

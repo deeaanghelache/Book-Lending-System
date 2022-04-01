@@ -1,7 +1,11 @@
 package entity.user;
 
 import entity.loan.Loan;
+import service.AdminService;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 import java.util.Set;
 
 public class Customer extends User{
@@ -57,7 +61,7 @@ public class Customer extends User{
                 "\n\t * First Name: " + firstName +
                 "\n\t * Last Name: " + lastName +
                 "\n\t * Email Address: " + emailAddress +
-                "\n\t * Password='" + password +
+                "\n\t * Password: " + password +
                 "\n\t * Address: " + address +
                 "\n\t * Company id: " + companyId);
 
@@ -71,6 +75,33 @@ public class Customer extends User{
             customer.append("\nThis customer has no loans!");
         }
         return customer.toString();
+    }
+
+
+    public String changeUsername(Scanner scanner){
+        scanner.nextLine();
+        System.out.println("Enter the new username: ");
+        String newUsername = scanner.nextLine();
+
+        this.setEmailAddress(newUsername);
+        return newUsername;
+    }
+
+    public void changePassword(Scanner scanner){
+        scanner.nextLine();
+        System.out.println("Enter the new password: ");
+        String newPassword = scanner.nextLine();
+        System.out.println("Enter the new password again: ");
+        String duplicate = scanner.nextLine();
+
+        if (newPassword.equals(duplicate))
+        {
+            this.setPassword(newPassword);
+            System.out.println("Your password has been successfully changed! ");
+        }
+        else {
+            System.out.println("The passwords aren't identical!");
+        }
     }
 }
 

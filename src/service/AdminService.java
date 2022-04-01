@@ -6,6 +6,7 @@ import entity.category.Category;
 import entity.category.Subcategory;
 import entity.company.Company;
 import entity.loan.Loan;
+import entity.review.Review;
 import entity.user.Admin;
 import entity.user.Customer;
 
@@ -55,7 +56,7 @@ public class AdminService implements Service {
         }
     }
 
-    public void addBook(Scanner scanner){
+    private void addBook(Scanner scanner){
         System.out.println("Give the following information about a book: ");
 
         System.out.println("Name: ");
@@ -148,7 +149,7 @@ public class AdminService implements Service {
 //        System.out.println(name + " " + description);
     }
 
-    public void addAudioBook(Scanner scanner){
+    private void addAudioBook(Scanner scanner){
         System.out.println("Give the following information about an audiobook: ");
 
         System.out.println("Name: ");
@@ -230,7 +231,7 @@ public class AdminService implements Service {
         audiobooks.add(currentAudioBook);
     }
 
-    public void addEBook(Scanner scanner){
+    private void addEBook(Scanner scanner){
         System.out.println("Give the following information about an eBook: ");
 
         System.out.println("Name: ");
@@ -315,7 +316,7 @@ public class AdminService implements Service {
         ebooks.add(currentEBook);
     }
 
-    public void addCompany(Scanner scanner){
+    private void addCompany(Scanner scanner){
         System.out.println("Name: ");
         String name = scanner.nextLine();
 
@@ -373,23 +374,23 @@ public class AdminService implements Service {
         }
     }
 
-    public void removeBookFromList(int idToRemove){
+    private void removeBookFromList(int idToRemove){
         books.removeIf(x -> x.getId() == idToRemove);
     }
 
-    public void removeAudioBookFromList(int idToRemove){
+    private void removeAudioBookFromList(int idToRemove){
         audiobooks.removeIf(x -> x.getId() == idToRemove);
     }
 
-    public void removeEBookFromList(int idToRemove){
+    private void removeEBookFromList(int idToRemove){
         ebooks.removeIf(x -> x.getId() == idToRemove);
     }
 
-    public void removeCompany(int idToRemove){
+    private void removeCompany(int idToRemove){
         companies.removeIf(x -> x.getCompanyId() == idToRemove);
     }
 
-    public void displayBooks(){
+    private void displayBooks(){
         BookNameComparator bookNameComparator = new BookNameComparator();
         books.sort(bookNameComparator);
 
@@ -398,19 +399,19 @@ public class AdminService implements Service {
         }
     }
 
-    public void displayAudiobooks(){
+    private void displayAudiobooks(){
         for (Audiobook audiobook : audiobooks){
             System.out.println(audiobook);
         }
     }
 
-    public void displayEBooks(){
+    private void displayEBooks(){
         for (EBook ebook : ebooks){
             System.out.println(ebook);
         }
     }
 
-    public void displayCompanies(){
+    private void displayCompanies(){
         for (Company company : companies){
             System.out.println(company);
         }
@@ -485,6 +486,7 @@ public class AdminService implements Service {
                     System.out.println("\t -> Option 2 - AudioBooks ");
                     System.out.println("\t -> Option 3 - EBooks ");
                     System.out.println("\t -> Option 4 - Companies ");
+                    System.out.println("\t -> Option 5 - Customers ");
 
                     int option4 = scanner.nextInt();
                     scanner.nextLine();
@@ -494,6 +496,7 @@ public class AdminService implements Service {
                         case (2) -> displayAudiobooks();
                         case (3) -> displayEBooks();
                         case (4) -> displayCompanies();
+                        case (5) -> displayCustomers();
                     }
                     System.out.println("\n");
                     break;
@@ -539,5 +542,9 @@ public class AdminService implements Service {
 
     public List<Customer> getCustomers() {
         return customers;
+    }
+
+    public void setCustomers(List<Customer> customers) {
+        this.customers = customers;
     }
 }

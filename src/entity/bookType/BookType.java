@@ -2,14 +2,18 @@ package entity.bookType;
 
 import entity.category.Category;
 import entity.category.Subcategory;
+import entity.review.Review;
 
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 
 public abstract class BookType{
     protected int id;
     protected String name, author, description, availability;
     protected Category category;
     protected Subcategory subcategory;
+    protected List<Review> reviews = new ArrayList<>();
 
     public BookType(int id, String name, String author, String description, Category category, Subcategory subcategory, String availability) {
         this.id = id;
@@ -24,6 +28,10 @@ public abstract class BookType{
 //    public BookType() {}
 
     abstract public void setAvailability(String availability);
+
+    public void addReview(Review review){
+        this.reviews.add(review);
+    }
 
 //    @Override
 //    public int compare(Book book1, Book book2){
@@ -76,5 +84,13 @@ public abstract class BookType{
 
     public void setAuthor(String author) {
         this.author = author;
+    }
+
+    public List<Review> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(List<Review> reviews) {
+        this.reviews = reviews;
     }
 }

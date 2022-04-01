@@ -1,11 +1,10 @@
 package service;
 
-
 import entity.bookType.Audiobook;
 import entity.bookType.Book;
 import entity.bookType.EBook;
 import entity.loan.Loan;
-import entity.user.Admin;
+import entity.review.Review;
 import entity.user.Customer;
 
 import java.time.LocalDate;
@@ -64,6 +63,19 @@ public class CustomerService implements Service {
         }
         return available;
     }
+
+//    private boolean checkIfBookExists(String name, AdminService as){
+//        var books = as.getBooks();
+//
+//        for(Book book : books){
+//            if (Objects.equals(book.getName().toLowerCase(), name.toLowerCase())){
+//                if (book.getNumberOfBooksAvailable() > 0){
+//                    return true;
+//                }
+//            }
+//        }
+//        return false;
+//    }
 
     public boolean checkIfAudioBookExists(String name, AdminService as){
         var audiobooks = as.getAudiobooks();
@@ -205,6 +217,7 @@ public class CustomerService implements Service {
 
     public void viewProfile(AdminService admin, String username){
         var customers = admin.getCustomers();
+//        System.out.println(customers);
 
         for (Customer customer : customers){
             if (customer.getEmailAddress().equals(username)){
@@ -215,16 +228,103 @@ public class CustomerService implements Service {
         }
     }
 
+    public void reviewBook(Book book, Scanner scanner){
+        // un review este anonim, iar un user poate oferi un review
+        System.out.println("\t------- BOOK REVIEW " + book.getName() + " -------");
+        System.out.println("Give a rating 1-5: ");
+
+        int rating = scanner.nextInt();
+        scanner.nextLine();
+
+        System.out.println("Do you want to write something about this book (yes/no)?");
+        String answer = scanner.nextLine();
+
+        switch (answer){
+            case ("yes") -> {
+                System.out.println("Write your review here and press ENTER when you're done: ");
+                String reviewDescription = scanner.nextLine();
+                Review review = new Review(rating, reviewDescription);
+                book.addReview(review);
+            }
+            case ("no") -> {
+                Review review = new Review(rating, "");
+                book.addReview(review);
+            }
+        }
+
+        System.out.println("Your review has been saved! Thank you!");
+    }
+
+    public void reviewEBook(EBook ebook, Scanner scanner){
+        System.out.println("\t------- EBOOK REVIEW " + ebook.getName() + " -------");
+        System.out.println("Give a rating 1-5: ");
+
+        int rating = scanner.nextInt();
+        scanner.nextLine();
+
+        System.out.println("Do you want to write something about this ebook (yes/no)?");
+        String answer = scanner.nextLine();
+
+        switch (answer){
+            case ("yes") -> {
+                System.out.println("Write your review here and press ENTER when you're done: ");
+                String reviewDescription = scanner.nextLine();
+                Review review = new Review(rating, reviewDescription);
+                ebook.addReview(review);
+            }
+            case ("no") -> {
+                Review review = new Review(rating, "");
+                ebook.addReview(review);
+            }
+        }
+
+        System.out.println("Your review has been saved! Thank you!");
+    }
+
+    public void reviewAudioBook(Audiobook audiobook, Scanner scanner){
+        System.out.println("\t------- AUDIOBOOK REVIEW " + audiobook.getName() + " -------");
+        System.out.println("Give a rating 1-5: ");
+
+        int rating = scanner.nextInt();
+        scanner.nextLine();
+
+        System.out.println("Do you want to write something about this audiobook (yes/no)?");
+        String answer = scanner.nextLine();
+
+        switch (answer){
+            case ("yes") -> {
+                System.out.println("Write your review here and press ENTER when you're done: ");
+                String reviewDescription = scanner.nextLine();
+                Review review = new Review(rating, reviewDescription);
+                audiobook.addReview(review);
+            }
+            case ("no") -> {
+                Review review = new Review(rating, "");
+                audiobook.addReview(review);
+            }
+        }
+
+        System.out.println("Your review has been saved! Thank you!");
+    }
+
     @Override
     public void menu(Scanner scanner, AdminService admin, String username) {
         System.out.println("\n\t\t\t------------- CUSTOMER MENU -------------");
+
+        var books = admin.getBooks();
+        var audiobooks = admin.getAudiobooks();
+        var ebooks = admin.getEbooks();
+        var customers = admin.getCustomers();
 
         while(true){
             System.out.println("\t Please choose what you want to do: ");
             System.out.println("\t -> Option 1 - Loan some books ");
             System.out.println("\t -> Option 2 - Display your loans ");
             System.out.println("\t -> Option 3 - View your profile ");
-            System.out.println("\t -> Option 4 - EXIT ");
+            System.out.println("\t -> Option 4 - Review something you read ");
+            System.out.println("\t -> Option 5 - Change your username ");
+            System.out.println("\t -> Option 6 - Change your password ");
+            System.out.println("\t -> Option 7 - EXIT ");
 
             int option1 = scanner.nextInt();
 
@@ -233,6 +333,83 @@ public class CustomerService implements Service {
                 case (2) -> displayLoansCustomer(username, admin);
                 case (3) -> viewProfile(admin, username);
                 case (4) -> {
+                    System.out.println("\t Please choose what you want to review: ");
+                    System.out.println("\t -> Option 1 - Book ");
+                    System.out.println("\t -> Option 2 - EBook ");
+                    System.out.println("\t -> Option 3 - AudioBook ");
+
+                    scanner.nextLine();
+                    int answer = scanner.nextInt();
+
+                    switch (answer){
+                        case (1) -> {
+                            scanner.nextLine();
+                            System.out.println("\t Enter the name of the book: ");
+                            String name = scanner.nextLine();
+                            boolean found = false;
+
+                            for(Book book : books){
+                                if (book.getName().equalsIgnoreCase(name)){
+                                    reviewBook(book, scanner);
+                                    found = true;
+                                }
+                            }
+
+                            if (!found){
+                                System.out.println("Sorry, we don't have the book you wanted to review in our database.");
+                            }
+                        }
+                        case (2) -> {
+                            scanner.nextLine();
+                            System.out.println("\t Enter the name of the ebook: ");
+                            String name = scanner.nextLine();
+                            boolean found = false;
+
+                            for(EBook ebook : ebooks){
+                                if (ebook.getName().equalsIgnoreCase(name)){
+                                    reviewEBook(ebook, scanner);
+                                    found = true;
+                                }
+                            }
+
+                            if (!found){
+                                System.out.println("Sorry, we don't have the ebook you wanted to review in our database.");
+                            }
+                        }
+                        case (3) -> {
+                            scanner.nextLine();
+                            System.out.println("\t Enter the name of the audiobook: ");
+                            String name = scanner.nextLine();
+                            boolean found = false;
+
+                            for(Audiobook audiobook : audiobooks){
+                                if (audiobook.getName().equalsIgnoreCase(name)){
+                                    reviewAudioBook(audiobook, scanner);
+                                    found = true;
+                                }
+                            }
+
+                            if (!found){
+                                System.out.println("Sorry, we don't have the audiobook you wanted to review in our database.");
+                            }
+                        }
+                    }
+                }
+                case (5) -> {
+                    for (var customer : customers) {
+                        if (customer.getEmailAddress().equals(username)) {
+                            username = customer.changeUsername(scanner);
+                        }
+                    }
+                }
+                case (6) -> {
+                    for (var customer : customers){
+                        if (customer.getEmailAddress().equals(username)){
+                            customer.changePassword(scanner);
+                        }
+                    }
+                }
+                case (7) -> {
                     System.out.println("Goodbye, " + username);
                     return;
                 }
@@ -268,7 +445,7 @@ public class CustomerService implements Service {
         }
     }
 
-    public void displayAllLoans(){
+    private void displayAllLoans(){
         // sa afisezi toate loans din aplicatie
         for (Loan loan : loans){
             System.out.println(loan);

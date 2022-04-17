@@ -1,10 +1,7 @@
 package entity.user;
 
 import entity.loan.Loan;
-import service.AdminService;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 

@@ -3,7 +3,6 @@ package entity.loan;
 
 import entity.bookType.Audiobook;
 import entity.bookType.Book;
-import entity.bookType.BookType;
 import entity.bookType.EBook;
 
 import java.time.LocalDate;

@@ -3,7 +3,9 @@ package entity.company;
 public class Company {
     private static int companyNumber = 1;
     private final int companyId;
-    private String name, address, telephoneNumber;
+    private String name;
+    private String address;
+    private String telephoneNumber;
 
     public Company(String name, String address, String telephoneNumber) {
         this.companyId = companyNumber;

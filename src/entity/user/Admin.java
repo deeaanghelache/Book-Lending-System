@@ -1,18 +1,5 @@
 package entity.user;
 
-import entity.bookType.Audiobook;
-import entity.bookType.Book;
-import entity.bookType.EBook;
-import entity.category.Category;
-import entity.category.Subcategory;
-import entity.company.Company;
-import entity.loan.Loan;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
-import java.util.TreeMap;
-
 public class Admin extends User{
     private static Admin admin;
 
@@ -44,5 +31,15 @@ public class Admin extends User{
     @Override
     public String getEmailAddress() {
         return "admin";
+    }
+
+    @Override
+    public void setPassword(String password) {
+        return;
+    }
+
+    @Override
+    public void setEmailAddress(String emailAddress) {
+        return;
     }
 }

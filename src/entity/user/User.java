@@ -2,7 +2,9 @@ package entity.user;
 
 public abstract class User {
     protected final int userId;
-    protected String firstName, lastName, emailAddress;
+    protected String firstName;
+    protected String lastName;
+    protected String emailAddress;
     protected String password;
 
     public User(int userId, String firstName, String lastName, String emailAddress, String password) {
@@ -46,7 +48,6 @@ public abstract class User {
     public void setEmailAddress(String emailAddress) {
         this.emailAddress = emailAddress;
     }
-
 
     public String getPassword() {
         return password;

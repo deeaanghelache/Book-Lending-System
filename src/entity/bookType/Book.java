@@ -5,8 +5,10 @@ import entity.category.Subcategory;
 
 public class Book extends BookType{
     private static int booksNumber = 1;
-    private int numberOfBooksAvailable, numberOfPages;
-    private String coverType, publishingHouse;
+    private int numberOfBooksAvailable;
+    private int numberOfPages;
+    private String coverType;
+    private String publishingHouse;
 
 
     public Book(String name, String author, String description, Category category, Subcategory subcategory, String availability, int numberOfBooksAvailable, int numberOfPages, String coverType, String publishingHouse) {

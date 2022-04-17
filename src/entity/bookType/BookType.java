@@ -5,12 +5,14 @@ import entity.category.Subcategory;
 import entity.review.Review;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 public abstract class BookType{
     protected int id;
-    protected String name, author, description, availability;
+    protected String name;
+    protected String author;
+    protected String description;
+    protected String availability;
     protected Category category;
     protected Subcategory subcategory;
     protected List<Review> reviews = new ArrayList<>();

@@ -5,9 +5,9 @@ import entity.category.Category;
 import entity.category.Subcategory;
 import entity.company.Company;
 import entity.loan.Loan;
+import entity.user.Customer;
 import service.AdminService;
 import service.CustomerService;
-import entity.user.Customer;
 
 import java.util.*;
 

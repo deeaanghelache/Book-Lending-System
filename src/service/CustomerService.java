@@ -8,7 +8,10 @@ import entity.review.Review;
 import entity.user.Customer;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Scanner;
 
 public class CustomerService implements Service {
     //    private TreeMap<Integer, List<Loan>> customerLoans = new TreeMap<>(); // customerId, loans

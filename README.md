@@ -1,4 +1,19 @@
-# Book Lending System
+# Book Lending System :books:
+
+This is a book lending project. Customers can borrow books, audiobooks or ebooks and review the ones they liked.
+
+## Functionalities
+|                           Admin                           |     Customer      |
+|:---------------------------------------------------------:|:-----------------:|
+|                           Menu                            |       Menu        |
+|                           Login                           |       Login       |
+|        Add (Books, Ebooks, Audiobooks, Companies)         |     Register      |
+|       Remove (Books, Ebooks, Audiobooks, Companies)       |    Make a loan    |
+| Display (Books, Ebooks, Audiobooks, Companies, Customers) |   View profile    |
+|                                                           | Display all loans |
+|                                                           |  Change password  |
+|                                                           |  Change username  |
+|                                                           | Review a product  |
 
 ## Objects:
 
@@ -11,6 +26,7 @@
 - User
     - Admin
     - Customer
+- Review
 - Category (enum)
 - Subcategory (enum)
 - Main
@@ -18,28 +34,14 @@
 - Customer Service
 
 ## Functions:
-- **Admin Service:**
+- **Admin**
     - Login
     - Menu (from Service Interface)
-    - *Add Functions:*
-        - Add Book
-        - Add AudioBook
-        - Add EBook
-        - Add Company
-        - Add Customer
-    - *Remove Functions:*
-        - Remove Book
-        - Remove AudioBook
-        - Remove EBook
-        - Remove Company
-    - *Display Functions:*
-        - Display Books
-        - Display Audiobooks
-        - Display EBooks
-        - Display Companies
-        - Display Customers
+    - *Add Functions* (book, audiobook, ebook, company, customer)
+    - *Remove Functions* (book, audiobook, ebook, company)
+    - *Display Functions* (book, audiobook, ebook, company, customer)
 ---------------------
-- **Customer Service**
+- **Customer**
     - Login
     - Menu (from Service Interface)
     - Check If Book Available
@@ -48,6 +50,10 @@
     - Add Loan
     - Display Loans For A Given Customer
     - Display All Loans
+    - Review (book, audiobook, ebook)
+    - Change password
+    - Change Username
+    
 
 # Cerințe
 

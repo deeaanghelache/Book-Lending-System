@@ -7,17 +7,17 @@ import entity.loan.Loan;
 import entity.review.Review;
 import entity.user.Customer;
 
+import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Scanner;
+import java.util.*;
 
 public class CustomerService implements Service {
     //    private TreeMap<Integer, List<Loan>> customerLoans = new TreeMap<>(); // customerId, loans
     private List<Loan> loans = new ArrayList<>();
 
-    public void login(Scanner scanner, AdminService admin){
+    public void login(Scanner scanner, AdminService admin, AuditService audit) throws IOException {
+        audit.writeActionToFile("CustomerLogin");
+
         System.out.println("\n\t\t\t------------- CUSTOMER LOGIN -------------");
         int attempts = 3;
 
@@ -44,7 +44,7 @@ public class CustomerService implements Service {
             }
 
             System.out.println("\t - You are now logged in as customer -");
-            menu(scanner, admin, customerUsername);
+            menu(scanner, admin, customerUsername, audit);
             break;
         }
     }
@@ -105,7 +105,7 @@ public class CustomerService implements Service {
     }
 
     // adding a loan using the username(email) of the client
-    public void addLoan(String email, AdminService as){
+    public void addLoan(String email, AdminService as, AuditService audit) throws IOException {
         // sa adaugi un loan (cu username)
         System.out.println("-------Loan a book-------");
         System.out.println("Please enter the name of the book/audiobook/ebook you want");
@@ -213,12 +213,14 @@ public class CustomerService implements Service {
                     currentloans.add(currentLoan);
                     setLoans(currentloans);
 //                    System.out.println(getLoans());
+
+                    audit.writeActionToFile("AddLoan");
                 }
             }
         }
     }
 
-    public void viewProfile(AdminService admin, String username){
+    public void viewProfile(AdminService admin, String username, AuditService audit) throws IOException {
         var customers = admin.getCustomers();
 //        System.out.println(customers);
 
@@ -226,13 +228,16 @@ public class CustomerService implements Service {
             if (customer.getEmailAddress().equals(username)){
                 System.out.println(customer);
                 System.out.println("\n");
+                audit.writeActionToFile("ViewProfile");
                 return;
             }
         }
     }
 
-    public void reviewBook(Book book, Scanner scanner){
+    public void reviewBook(Book book, Scanner scanner, AuditService audit) throws IOException {
         // un review este anonim, iar un user poate oferi un review
+        audit.writeActionToFile("ReviewBook");
+
         System.out.println("\t------- BOOK REVIEW " + book.getName() + " -------");
         System.out.println("Give a rating 1-5: ");
 
@@ -247,18 +252,20 @@ public class CustomerService implements Service {
                 System.out.println("Write your review here and press ENTER when you're done: ");
                 String reviewDescription = scanner.nextLine();
                 Review review = new Review(rating, reviewDescription);
-                book.addReview(review);
+                book.addReview(review, audit);
             }
             case ("no") -> {
                 Review review = new Review(rating, "");
-                book.addReview(review);
+                book.addReview(review, audit);
             }
         }
 
         System.out.println("Your review has been saved! Thank you!");
     }
 
-    public void reviewEBook(EBook ebook, Scanner scanner){
+    public void reviewEBook(EBook ebook, Scanner scanner, AuditService audit) throws IOException {
+        audit.writeActionToFile("ReviewEBook");
+
         System.out.println("\t------- EBOOK REVIEW " + ebook.getName() + " -------");
         System.out.println("Give a rating 1-5: ");
 
@@ -273,18 +280,20 @@ public class CustomerService implements Service {
                 System.out.println("Write your review here and press ENTER when you're done: ");
                 String reviewDescription = scanner.nextLine();
                 Review review = new Review(rating, reviewDescription);
-                ebook.addReview(review);
+                ebook.addReview(review, audit);
             }
             case ("no") -> {
                 Review review = new Review(rating, "");
-                ebook.addReview(review);
+                ebook.addReview(review, audit);
             }
         }
 
         System.out.println("Your review has been saved! Thank you!");
     }
 
-    public void reviewAudioBook(Audiobook audiobook, Scanner scanner){
+    public void reviewAudioBook(Audiobook audiobook, Scanner scanner, AuditService audit) throws IOException {
+        audit.writeActionToFile("ReviewAudioBook");
+
         System.out.println("\t------- AUDIOBOOK REVIEW " + audiobook.getName() + " -------");
         System.out.println("Give a rating 1-5: ");
 
@@ -299,11 +308,11 @@ public class CustomerService implements Service {
                 System.out.println("Write your review here and press ENTER when you're done: ");
                 String reviewDescription = scanner.nextLine();
                 Review review = new Review(rating, reviewDescription);
-                audiobook.addReview(review);
+                audiobook.addReview(review, audit);
             }
             case ("no") -> {
                 Review review = new Review(rating, "");
-                audiobook.addReview(review);
+                audiobook.addReview(review, audit);
             }
         }
 
@@ -311,13 +320,26 @@ public class CustomerService implements Service {
     }
 
     @Override
-    public void menu(Scanner scanner, AdminService admin, String username) {
+    public void menu(Scanner scanner, AdminService admin, String username, AuditService audit) throws IOException {
+        audit.writeActionToFile("CustomerMenu");
+
         System.out.println("\n\t\t\t------------- CUSTOMER MENU -------------");
 
+        final String finalUsername = username;
         var books = admin.getBooks();
         var audiobooks = admin.getAudiobooks();
         var ebooks = admin.getEbooks();
         var customers = admin.getCustomers();
+
+//        Optional<Customer> currentCustomer = customers
+//                .stream()
+//                .filter(x -> x.getEmailAddress().equals(finalUsername))
+//                .findFirst();
+
+//        Set<Loan> currentLoans = new HashSet<>();
+//        if (currentCustomer.isPresent()){
+//            currentLoans = currentCustomer.get().getLoans();
+//        }
 
         while(true){
             System.out.println("\t Please choose what you want to do: ");
@@ -332,9 +354,9 @@ public class CustomerService implements Service {
             int option1 = scanner.nextInt();
 
             switch (option1) {
-                case (1) -> addLoan(username, admin);
-                case (2) -> displayLoansCustomer(username, admin);
-                case (3) -> viewProfile(admin, username);
+                case (1) -> addLoan(username, admin, audit);
+                case (2) -> displayLoansCustomer(username, admin, audit);
+                case (3) -> viewProfile(admin, username, audit);
                 case (4) -> {
                     System.out.println("\t Please choose what you want to review: ");
                     System.out.println("\t -> Option 1 - Book ");
@@ -353,7 +375,7 @@ public class CustomerService implements Service {
 
                             for(Book book : books){
                                 if (book.getName().equalsIgnoreCase(name)){
-                                    reviewBook(book, scanner);
+                                    reviewBook(book, scanner, audit);
                                     found = true;
                                 }
                             }
@@ -370,7 +392,7 @@ public class CustomerService implements Service {
 
                             for(EBook ebook : ebooks){
                                 if (ebook.getName().equalsIgnoreCase(name)){
-                                    reviewEBook(ebook, scanner);
+                                    reviewEBook(ebook, scanner, audit);
                                     found = true;
                                 }
                             }
@@ -387,7 +409,7 @@ public class CustomerService implements Service {
 
                             for(Audiobook audiobook : audiobooks){
                                 if (audiobook.getName().equalsIgnoreCase(name)){
-                                    reviewAudioBook(audiobook, scanner);
+                                    reviewAudioBook(audiobook, scanner, audit);
                                     found = true;
                                 }
                             }
@@ -401,14 +423,14 @@ public class CustomerService implements Service {
                 case (5) -> {
                     for (var customer : customers) {
                         if (customer.getEmailAddress().equals(username)) {
-                            username = customer.changeUsername(scanner);
+                            username = customer.changeUsername(scanner, audit);
                         }
                     }
                 }
                 case (6) -> {
                     for (var customer : customers){
                         if (customer.getEmailAddress().equals(username)){
-                            customer.changePassword(scanner);
+                            customer.changePassword(scanner, audit);
                         }
                     }
                 }
@@ -420,7 +442,8 @@ public class CustomerService implements Service {
         }
     }
 
-    public void displayLoansCustomer(String username, AdminService admin){
+    public void displayLoansCustomer(String username, AdminService admin, AuditService audit) throws IOException {
+        audit.writeActionToFile("DisplayLoansForLogggedCustomer");
         // sa afisezi toate loans pentru un customer dat
 
         var customers = admin.getCustomers();

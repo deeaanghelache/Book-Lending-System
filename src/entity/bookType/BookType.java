@@ -3,6 +3,7 @@ package entity.bookType;
 import entity.category.Category;
 import entity.category.Subcategory;
 import entity.review.Review;
+import service.AuditService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +32,7 @@ public abstract class BookType{
 
     abstract public void setAvailability(String availability);
 
-    public void addReview(Review review){
+    public void addReview(Review review, AuditService audit){
         this.reviews.add(review);
     }
 

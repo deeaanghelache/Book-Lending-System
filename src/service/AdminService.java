@@ -10,8 +10,11 @@ import entity.company.Company;
 import entity.loan.Loan;
 import entity.user.Admin;
 import entity.user.Customer;
+import entity.user.User;
 
+import java.io.IOException;
 import java.util.*;
+import java.util.function.Predicate;
 
 public class AdminService implements Service {
     private List<Book> books = new ArrayList<>();
@@ -30,7 +33,9 @@ public class AdminService implements Service {
         this.customers = customers;
     }
 
-    public void login(Scanner scanner, AdminService adminService, String username){
+    public void login(Scanner scanner, AdminService adminService, String username, AuditService audit) throws IOException {
+        audit.writeActionToFile("AdminLogin");
+
         scanner.nextLine();
         System.out.println("\n\t\t\t------------- ADMIN LOGIN -------------");
         Admin admin = Admin.getAdminInstance();
@@ -52,12 +57,14 @@ public class AdminService implements Service {
                 continue;
             }
             System.out.println("\t - You are now logged in as admin -");
-            menu(scanner, adminService, "admin");
+            menu(scanner, adminService, "admin", audit);
             break;
         }
     }
 
-    private void addBook(Scanner scanner){
+    private void addBook(Scanner scanner, AuditService audit) throws IOException {
+        audit.writeActionToFile("AddBook");
+
         System.out.println("Give the following information about a book: ");
 
         System.out.println("Name: ");
@@ -150,7 +157,9 @@ public class AdminService implements Service {
 //        System.out.println(name + " " + description);
     }
 
-    private void addAudioBook(Scanner scanner){
+    private void addAudioBook(Scanner scanner, AuditService audit) throws IOException {
+        audit.writeActionToFile("AddAudioBook");
+
         System.out.println("Give the following information about an audiobook: ");
 
         System.out.println("Name: ");
@@ -232,7 +241,9 @@ public class AdminService implements Service {
         audiobooks.add(currentAudioBook);
     }
 
-    private void addEBook(Scanner scanner){
+    private void addEBook(Scanner scanner, AuditService audit) throws IOException {
+        audit.writeActionToFile("AddEBook");
+
         System.out.println("Give the following information about an eBook: ");
 
         System.out.println("Name: ");
@@ -317,7 +328,9 @@ public class AdminService implements Service {
         ebooks.add(currentEBook);
     }
 
-    private void addCompany(Scanner scanner){
+    private void addCompany(Scanner scanner, AuditService audit) throws IOException {
+        audit.writeActionToFile("AddCompany");
+
         System.out.println("Name: ");
         String name = scanner.nextLine();
 
@@ -332,7 +345,9 @@ public class AdminService implements Service {
     }
 
     // register
-    public void addCustomer(Scanner scanner){
+    public void addCustomer(Scanner scanner, AuditService audit) throws IOException {
+        audit.writeActionToFile("Register");
+
         System.out.println();
         System.out.println("-------REGISTER--------");
 
@@ -375,23 +390,29 @@ public class AdminService implements Service {
         }
     }
 
-    private void removeBookFromList(int idToRemove){
+    private void removeBookFromList(int idToRemove, AuditService audit) throws IOException {
+        audit.writeActionToFile("RemoveBook");
         books.removeIf(x -> x.getId() == idToRemove);
     }
 
-    private void removeAudioBookFromList(int idToRemove){
+    private void removeAudioBookFromList(int idToRemove, AuditService audit) throws IOException {
+        audit.writeActionToFile("RemoveAudioBook");
         audiobooks.removeIf(x -> x.getId() == idToRemove);
     }
 
-    private void removeEBookFromList(int idToRemove){
+    private void removeEBookFromList(int idToRemove, AuditService audit) throws IOException {
+        audit.writeActionToFile("RemoveEBook");
         ebooks.removeIf(x -> x.getId() == idToRemove);
     }
 
-    private void removeCompany(int idToRemove){
+    private void removeCompany(int idToRemove, AuditService audit) throws IOException {
+        audit.writeActionToFile("RemoveCompany");
         companies.removeIf(x -> x.getCompanyId() == idToRemove);
     }
 
-    private void displayBooks(){
+    private void displayBooks(AuditService audit) throws IOException {
+        audit.writeActionToFile("DisplayBooks");
+
         BookNameComparator bookNameComparator = new BookNameComparator();
         books.sort(bookNameComparator);
 
@@ -400,32 +421,42 @@ public class AdminService implements Service {
         }
     }
 
-    private void displayAudiobooks(){
+    private void displayAudiobooks(AuditService audit) throws IOException {
+        audit.writeActionToFile("DisplayAudiobooks");
+
         for (Audiobook audiobook : audiobooks){
             System.out.println(audiobook);
         }
     }
 
-    private void displayEBooks(){
+    private void displayEBooks(AuditService audit) throws IOException {
+        audit.writeActionToFile("DisplayEBooks");
+
         for (EBook ebook : ebooks){
             System.out.println(ebook);
         }
     }
 
-    private void displayCompanies(){
+    private void displayCompanies(AuditService audit) throws IOException {
+        audit.writeActionToFile("DisplayCompanies");
+
         for (Company company : companies){
             System.out.println(company);
         }
     }
 
-    public void displayCustomers(){
+    public void displayCustomers(AuditService audit) throws IOException {
+        audit.writeActionToFile("DisplayCustomers");
+
         for (Customer customer : customers){
             System.out.println(customer);
         }
     }
 
     @Override
-    public void menu(Scanner scanner, AdminService admin, String username) {
+    public void menu(Scanner scanner, AdminService admin, String username, AuditService audit) throws IOException {
+        audit.writeActionToFile("AdminMenu");
+
         System.out.println("\n\t\t\t------------- ADMIN MENU -------------");
 
         while(true){
@@ -433,7 +464,9 @@ public class AdminService implements Service {
             System.out.println("\t -> Option 1 - Add items in the database ");
             System.out.println("\t -> Option 2 - Remove items in the database ");
             System.out.println("\t -> Option 3 - Display existing items ");
-            System.out.println("\t -> Option 4 - EXIT ");
+            System.out.println("\t -> Option 4 - View available books ");
+            System.out.println("\t -> Option 5 - List all customers that have loans ");
+            System.out.println("\t -> Option 6 - EXIT ");
 
             int option1 = scanner.nextInt();
 
@@ -451,10 +484,10 @@ public class AdminService implements Service {
                     scanner.nextLine();
 
                     switch (option2) {
-                        case (1) -> addBook(scanner);
-                        case (2) -> addAudioBook(scanner);
-                        case (3) -> addEBook(scanner);
-                        case (4) -> addCompany(scanner);
+                        case (1) -> addBook(scanner, audit);
+                        case (2) -> addAudioBook(scanner, audit);
+                        case (3) -> addEBook(scanner, audit);
+                        case (4) -> addCompany(scanner, audit);
                     }
                     break;
                 case (2):
@@ -473,10 +506,10 @@ public class AdminService implements Service {
                     int idToRemove = scanner.nextInt();
 
                     switch (option3) {
-                        case (1) -> removeBookFromList(idToRemove);
-                        case (2) -> removeAudioBookFromList(idToRemove);
-                        case (3) -> removeEBookFromList(idToRemove);
-                        case (4) -> removeCompany(idToRemove);
+                        case (1) -> removeBookFromList(idToRemove, audit);
+                        case (2) -> removeAudioBookFromList(idToRemove, audit);
+                        case (3) -> removeEBookFromList(idToRemove, audit);
+                        case (4) -> removeCompany(idToRemove, audit);
                     }
                     break;
                 case (3):
@@ -493,20 +526,54 @@ public class AdminService implements Service {
                     scanner.nextLine();
 
                     switch (option4) {
-                        case (1) -> displayBooks();
-                        case (2) -> displayAudiobooks();
-                        case (3) -> displayEBooks();
-                        case (4) -> displayCompanies();
-                        case (5) -> displayCustomers();
+                        case (1) -> displayBooks(audit);
+                        case (2) -> displayAudiobooks(audit);
+                        case (3) -> displayEBooks(audit);
+                        case (4) -> displayCompanies(audit);
+                        case (5) -> displayCustomers(audit);
                     }
                     System.out.println("\n");
                     break;
                 case (4):
+                    viewAvailableBooks(audit);
+                    break;
+                case (5):
+                    viewCustomersThatHaveLoans(audit);
+                    break;
+                case (6):
                     // Exit
                     System.out.println("Goodbye, " + username);
                     return;
             }
         }
+    }
+
+    public void viewAvailableBooks(AuditService audit) throws IOException {
+        audit.writeActionToFile("ViewAvailableBooks");
+        List<String> availableBooks = new ArrayList<>();
+
+        Predicate<Book> bookPredicate = book -> book.getNumberOfBooksAvailable() > 0;
+        for (Book book : books){
+            if (bookPredicate.test(book)){
+                availableBooks.add(book.getName());
+            }
+        }
+
+        System.out.println("\tAvailable Books:\n");
+        for (String name : availableBooks){
+            System.out.println("\t\t - " + name);
+        }
+    }
+
+    public void viewCustomersThatHaveLoans(AuditService audit) throws IOException {
+        audit.writeActionToFile("ViewCustomersThatHaveLoans");
+
+        var customersWithLoans = customers;
+        customersWithLoans
+                .stream()
+                .filter(x -> !x.getLoans().isEmpty())
+                .map(User::getEmailAddress)
+                .forEach(System.out::println);
     }
 
     public List<Book> getBooks() {

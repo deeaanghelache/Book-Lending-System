@@ -1,6 +1,7 @@
 package entity.user;
 
 import entity.loan.Loan;
+import service.AuditService;
 
 import java.util.Scanner;
 import java.util.Set;
@@ -75,7 +76,7 @@ public class Customer extends User{
     }
 
 
-    public String changeUsername(Scanner scanner){
+    public String changeUsername(Scanner scanner, AuditService audit){
         scanner.nextLine();
         System.out.println("Enter the new username: ");
         String newUsername = scanner.nextLine();
@@ -84,7 +85,7 @@ public class Customer extends User{
         return newUsername;
     }
 
-    public void changePassword(Scanner scanner){
+    public void changePassword(Scanner scanner, AuditService audit){
         scanner.nextLine();
         System.out.println("Enter the new password: ");
         String newPassword = scanner.nextLine();

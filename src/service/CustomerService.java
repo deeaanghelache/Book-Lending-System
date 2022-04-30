@@ -342,29 +342,55 @@ public class CustomerService implements Service {
 //        }
 
         while(true){
-            System.out.println("\t Please choose what you want to do: ");
-            System.out.println("\t -> Option 1 - Loan some books ");
-            System.out.println("\t -> Option 2 - Display your loans ");
-            System.out.println("\t -> Option 3 - View your profile ");
-            System.out.println("\t -> Option 4 - Review something you read ");
-            System.out.println("\t -> Option 5 - Change your username ");
-            System.out.println("\t -> Option 6 - Change your password ");
-            System.out.println("\t -> Option 7 - EXIT ");
+//            int option1 = scanner.nextInt();
+            int option1;
 
-            int option1 = scanner.nextInt();
+            while (true){
+                System.out.println("\t Please choose what you want to do: ");
+                System.out.println("\t -> Option 1 - Loan some books ");
+                System.out.println("\t -> Option 2 - Display your loans ");
+                System.out.println("\t -> Option 3 - View your profile ");
+                System.out.println("\t -> Option 4 - Review something you read ");
+                System.out.println("\t -> Option 5 - Change your username ");
+                System.out.println("\t -> Option 6 - Change your password ");
+                System.out.println("\t -> Option 7 - EXIT ");
+
+                try {
+                    option1 = scanner.nextInt();
+                    break;
+                }
+                catch (InputMismatchException exception) {
+                    scanner.nextLine();
+                    System.out.println("\t\tYou should enter a number 1-7");
+                    System.out.println("\t !! Please Try Again");
+                }
+            }
 
             switch (option1) {
                 case (1) -> addLoan(username, admin, audit);
                 case (2) -> displayLoansCustomer(username, admin, audit);
                 case (3) -> viewProfile(admin, username, audit);
                 case (4) -> {
-                    System.out.println("\t Please choose what you want to review: ");
-                    System.out.println("\t -> Option 1 - Book ");
-                    System.out.println("\t -> Option 2 - EBook ");
-                    System.out.println("\t -> Option 3 - AudioBook ");
 
                     scanner.nextLine();
-                    int answer = scanner.nextInt();
+                    int answer;
+
+                    while (true){
+                        System.out.println("\t Please choose what you want to review: ");
+                        System.out.println("\t -> Option 1 - Book ");
+                        System.out.println("\t -> Option 2 - EBook ");
+                        System.out.println("\t -> Option 3 - AudioBook ");
+
+                        try {
+                            answer = scanner.nextInt();
+                            break;
+                        }
+                        catch (InputMismatchException exception) {
+                            scanner.nextLine();
+                            System.out.println("\t\tYou should enter a number 1-3");
+                            System.out.println("\t !! Please Try Again");
+                        }
+                    }
 
                     switch (answer){
                         case (1) -> {

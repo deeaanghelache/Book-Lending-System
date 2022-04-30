@@ -92,22 +92,46 @@ public class Main {
             while(true)
             {
                 System.out.println("********** WELCOME TO MY BOOK LENDING PROJECT **********");
-                System.out.println("\tPlease tell us if you are an admin, a customer or you want to exit by typing one of the 3 options:");
-                System.out.println("\t * Option 1 - Admin");
-                System.out.println("\t * Option 2 - Customer");
-                System.out.println("\t * Option 3 - Exit");
 
-                int option = scanner.nextInt();
+                int option;
+
+                while (true) {
+                    System.out.println("\tPlease tell us if you are an admin, a customer or you want to exit by typing one of the 3 options:");
+                    System.out.println("\t * Option 1 - Admin");
+                    System.out.println("\t * Option 2 - Customer");
+                    System.out.println("\t * Option 3 - Exit");
+
+                    try {
+                        option = scanner.nextInt();
+                        break;
+                    } catch (Exception exception) {
+                        scanner.nextLine();
+                        System.out.println("\t\tYou should enter a number 1-3");
+                        System.out.println("\t !! Please Try Again");
+                    }
+                }
 
                 if (option == 1) {
                     System.out.println("\t\t Welcome, admin! Please login in order to continue: ");
                     admin.login(scanner, admin, "admin", audit);
                 } else if (option == 2){
-                    System.out.println("\t\t Welcome, customer! Do you have an account?");
-                    System.out.println("\t * Option 1 - Yes");
-                    System.out.println("\t * Option 2 - No");
+                    int response;
 
-                    int response = scanner.nextInt();
+                    while (true) {
+                        System.out.println("\t\t Welcome, customer! Do you have an account?");
+                        System.out.println("\t * Option 1 - Yes");
+                        System.out.println("\t * Option 2 - No");
+
+                        try {
+                            response = scanner.nextInt();
+                            break;
+                        } catch (Exception exception) {
+                            scanner.nextLine();
+                            System.out.println("\t\tYou should enter a number 1-2");
+                            System.out.println("\t !! Please Try Again");
+                        }
+                    }
+
                     if (response == 1) {
                         scanner.nextLine();
                         System.out.println("\t Please login in order to continue: ");

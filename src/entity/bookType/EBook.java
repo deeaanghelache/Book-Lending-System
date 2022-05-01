@@ -33,7 +33,7 @@ public class EBook extends BookType {
                 "\n\t\t -> subcategory = " + subcategory +
                 "\n\t\t -> numberOfPages = " + numberOfPages +
                 "\n\t\t -> format = " + format +
-                "\n\t\t -> reviews: " + reviews;
+                "\n\t\t -> reviews: " + reviews + "\n";
     }
 
     public int getNumberOfPages() {

@@ -6,9 +6,7 @@ import entity.category.Subcategory;
 import entity.company.Company;
 import entity.loan.Loan;
 import entity.user.Customer;
-import service.AdminService;
-import service.AuditService;
-import service.CustomerService;
+import service.*;
 
 import java.io.IOException;
 import java.util.*;
@@ -156,18 +154,27 @@ public class Main {
     public static void main(String[] args) throws IOException {
 
         Scanner scanner = new Scanner(System.in);
+        ReadFromCsvFileService csvFileReader = ReadFromCsvFileService.getInstance();
 
         CustomerService customerService = new CustomerService();
 
-        var books = booksDatabase();
-        var audiobooks = audiobooksDatabase();
-        var ebooks = ebooksDatabase();
-        var companies = companiesDatabase();
-        var customers = customersDatabase();
+        var customers = csvFileReader.readCustomersFromCsv();
+        var companies = csvFileReader.readCompaniesFromCsv();
+        var books = csvFileReader.readItems(Book.class);
+        var audiobooks = csvFileReader.readItems(Audiobook.class);
+        var ebooks = csvFileReader.readItems(EBook.class);
 
         AdminService admin = new AdminService(books, audiobooks, ebooks, companies, customers);
         AuditService audit = new AuditService();
 
         initialDisplay(scanner, admin, customerService, audit);
+
+        /*
+            var books = booksDatabase();
+            var audiobooks = audiobooksDatabase();
+            var ebooks = ebooksDatabase();
+            var companies = companiesDatabase();
+            var customers = customersDatabase();
+        */
     }
 }

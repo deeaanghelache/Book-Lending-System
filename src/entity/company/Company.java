@@ -21,7 +21,7 @@ public class Company {
                 "\n\tcompanyId = " + companyId +
                 "\n\tname = " + name +
                 "\n\taddress = " + address +
-                "\n\ttelephoneNumber = " + telephoneNumber;
+                "\n\ttelephoneNumber = " + telephoneNumber + "\n";
     }
 
     public int getCompanyId() {

@@ -21,6 +21,8 @@ public class AdminService implements Service {
     private List<Company> companies = new ArrayList<>();
     private List<Customer> customers = new ArrayList<>();
 
+    private WriteToCsvFileService csvFileWriter = WriteToCsvFileService.getInstance();
+
     public AdminService() {}
 
     public AdminService(List<Book> books, List<Audiobook> audiobooks, List<EBook> ebooks, List<Company> companies, List<Customer> customers) {
@@ -166,7 +168,7 @@ public class AdminService implements Service {
 
         Book currentBook = new Book(name, author, description, categoryOfTheBook, subcategoryOfTheBook, availability, numberOfBooksAvailable, numberOfPages, coverType, publishingHouse);
         books.add(currentBook);
-
+        csvFileWriter.writeItemToCsv(currentBook, Book.class);
 //        System.out.println(name + " " + description);
     }
 
@@ -253,6 +255,7 @@ public class AdminService implements Service {
 
         Audiobook currentAudioBook = new Audiobook(name, author, description, categoryOfTheBook, subcategoryOfTheBook, availability, duration);
         audiobooks.add(currentAudioBook);
+        csvFileWriter.writeItemToCsv(currentAudioBook, Audiobook.class);
     }
 
     private void addEBook(Scanner scanner, AuditService audit) throws IOException {
@@ -355,6 +358,7 @@ public class AdminService implements Service {
 
         EBook currentEBook = new EBook(name, author, description, categoryOfTheBook, subcategoryOfTheBook, availability, numberOfPages, format);
         ebooks.add(currentEBook);
+        csvFileWriter.writeItemToCsv(currentEBook, EBook.class);
     }
 
     private void addCompany(Scanner scanner, AuditService audit) throws IOException {
@@ -372,12 +376,13 @@ public class AdminService implements Service {
 
         Company company = new Company(name, address, telephoneNumber);
         companies.add(company);
+        csvFileWriter.writeToCompanyCsv(company);
     }
 
     // register
     public void addCustomer(Scanner scanner, AuditService audit) throws IOException {
         audit.writeActionToFile("Register");
-        scanner.nextLine();
+//        scanner.nextLine();
 
         System.out.println();
         System.out.println("-------REGISTER--------");
@@ -414,7 +419,7 @@ public class AdminService implements Service {
         if (companyId != 0){
             Customer currentCustomer = new Customer(firstName, lastName, email, password, companyId, emptyList, address);
             customers.add(currentCustomer);
-//            System.out.println(currentCustomer);
+            csvFileWriter.writeToCustomerCsv(currentCustomer);
         }
         else{
             System.out.println("There is no company with the name provided!");

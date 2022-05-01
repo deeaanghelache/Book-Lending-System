@@ -28,6 +28,6 @@ public class Review {
     @Override
     public String toString() {
         return "\n\t\t\t - stars: " + stars +
-                ", description='" + description;
+                ", description='" + description + "\n";
     }
 }

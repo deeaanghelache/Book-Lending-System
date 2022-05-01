@@ -29,7 +29,7 @@ public class Audiobook extends BookType{
                 "\n\t\t -> category = " + category +
                 "\n\t\t -> subcategory = " + subcategory +
                 "\n\t\t -> duration = " + duration +
-                "\n\t\t -> reviews: " + reviews;
+                "\n\t\t -> reviews: " + reviews + "\n";
     }
 
     public int getDuration() {

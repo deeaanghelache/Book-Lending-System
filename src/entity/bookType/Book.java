@@ -42,7 +42,7 @@ public class Book extends BookType{
                 "\n\t\t -> numberOfPages = " + numberOfPages +
                 "\n\t\t -> coverType = " + coverType +
                 "\n\t\t -> publishingHouse = " + publishingHouse +
-                "\n\t\t -> reviews: " + reviews;
+                "\n\t\t -> reviews: " + reviews + "\n";
     }
 
     public int getNumberOfBooksAvailable() {

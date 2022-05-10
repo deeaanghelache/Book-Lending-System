@@ -1,5 +1,6 @@
 package service;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -12,11 +13,14 @@ public class AuditService {
             String fileName = "src/csvFiles/Audit.csv";
 
             this.writeToFile = new FileWriter(fileName, true);
+            File file = new File(fileName);
 
-            writeToFile.append("ActionName");
-            writeToFile.append(",");
-            writeToFile.append("TimeStamp");
-            writeToFile.append("\n");
+            if (file.length() == 0){
+                writeToFile.append("ActionName");
+                writeToFile.append(",");
+                writeToFile.append("TimeStamp");
+                writeToFile.append("\n");
+            }
         }
         catch (Exception exception){
             System.out.printf("\n\t\tException: " + exception.getMessage() + "\n");

@@ -9,7 +9,7 @@ public class EBook extends BookType {
     private String format; // pdf, kindle
 
     public EBook(String name, String author, String description, Category category, Subcategory subcategory, String availability, int numberOfPages, String format) {
-        super(ebooksNumber, name, author, description, category, subcategory, availability);
+        super(name, author, description, category, subcategory, availability);
         ebooksNumber++;
         this.numberOfPages = numberOfPages;
         this.format = format;

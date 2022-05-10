@@ -1,3 +1,5 @@
+import dao.configuration.DatabaseConfiguration;
+import dao.repository.*;
 import entity.bookType.Audiobook;
 import entity.bookType.Book;
 import entity.bookType.EBook;
@@ -151,10 +153,30 @@ public class Main {
         }
     }
 
+    static void createTables(){
+        CustomerRepository customerRepository = CustomerRepository.getCustomerRepository();
+        customerRepository.createTable();
+
+        AudiobookRepository audiobookRepository = AudiobookRepository.getAudiobookRepository();
+        audiobookRepository.createTable();
+
+        BookRepository bookRepository = BookRepository.getBookRepository();
+        bookRepository.createTable();
+
+        CompanyRepository companyRepository = CompanyRepository.getCompanyRepository();
+        companyRepository.createTable();
+
+        EbookRepository ebookRepository = EbookRepository.getEbookRepository();
+        ebookRepository.createTable();
+
+    }
+
     public static void main(String[] args) throws IOException {
 
         Scanner scanner = new Scanner(System.in);
         ReadFromCsvFileService csvFileReader = ReadFromCsvFileService.getInstance();
+
+//        createTables();
 
         CustomerService customerService = new CustomerService();
 
@@ -166,7 +188,6 @@ public class Main {
 
         AdminService admin = new AdminService(books, audiobooks, ebooks, companies, customers);
         AuditService audit = new AuditService();
-
         initialDisplay(scanner, admin, customerService, audit);
 
         /*
@@ -176,5 +197,7 @@ public class Main {
             var companies = companiesDatabase();
             var customers = customersDatabase();
         */
+
+        DatabaseConfiguration.closeDatabaseConfiguration();
     }
 }

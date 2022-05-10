@@ -18,6 +18,15 @@ public abstract class BookType{
     protected Subcategory subcategory;
     protected List<Review> reviews = new ArrayList<>();
 
+    public BookType(String name, String author, String description, Category category, Subcategory subcategory, String availability) {
+        this.name = name;
+        this.author = author;
+        this.description = description;
+        this.category = category;
+        this.subcategory = subcategory;
+        this.availability = availability;
+    }
+
     public BookType(int id, String name, String author, String description, Category category, Subcategory subcategory, String availability) {
         this.id = id;
         this.name = name;

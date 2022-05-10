@@ -1,15 +1,15 @@
 package entity.company;
 
 public class Company {
-    private static int companyNumber = 1;
-    private final int companyId;
+//    private static int companyNumber = 1;
+    private int companyId;
     private String name;
     private String address;
     private String telephoneNumber;
 
     public Company(String name, String address, String telephoneNumber) {
-        this.companyId = companyNumber;
-        companyNumber++;
+//        this.companyId = companyNumber;
+//        companyNumber++;
         this.name = name;
         this.address = address;
         this.telephoneNumber = telephoneNumber;

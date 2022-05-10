@@ -1,5 +1,6 @@
 package service;
 
+import dao.repository.*;
 import entity.bookType.*;
 import entity.category.Category;
 import entity.category.Subcategory;
@@ -21,7 +22,13 @@ public class AdminService implements Service {
     private List<Company> companies = new ArrayList<>();
     private List<Customer> customers = new ArrayList<>();
 
-    private WriteToCsvFileService csvFileWriter = WriteToCsvFileService.getInstance();
+    private final WriteToCsvFileService csvFileWriter = WriteToCsvFileService.getInstance();
+
+    private static final CompanyRepository companyRepository = CompanyRepository.getCompanyRepository();
+    private static final CustomerRepository customerRepository = CustomerRepository.getCustomerRepository();
+    private static final AudiobookRepository audiobookRepository = AudiobookRepository.getAudiobookRepository();
+    private static final BookRepository bookRepository = BookRepository.getBookRepository();
+    private static final EbookRepository ebookRepository = EbookRepository.getEbookRepository();
 
     public AdminService() {}
 
@@ -169,6 +176,7 @@ public class AdminService implements Service {
         Book currentBook = new Book(name, author, description, categoryOfTheBook, subcategoryOfTheBook, availability, numberOfBooksAvailable, numberOfPages, coverType, publishingHouse);
         books.add(currentBook);
         csvFileWriter.writeItemToCsv(currentBook, Book.class);
+        bookRepository.insertBook(name, author, description, categoryOfTheBook, subcategoryOfTheBook, availability, numberOfBooksAvailable, numberOfPages, coverType, publishingHouse);
 //        System.out.println(name + " " + description);
     }
 
@@ -377,6 +385,8 @@ public class AdminService implements Service {
         Company company = new Company(name, address, telephoneNumber);
         companies.add(company);
         csvFileWriter.writeToCompanyCsv(company);
+
+        companyRepository.insertCompany(name, address, telephoneNumber);
     }
 
     // register
@@ -407,12 +417,13 @@ public class AdminService implements Service {
         System.out.println("Company name: ");
         String companyName = scanner.nextLine();
 
-        int companyId = 0;
-        for (Company company : companies) {
-            if (company.getName().toUpperCase().equals(companyName.toUpperCase())){
-                companyId = company.getCompanyId();
-            }
-        }
+        int companyId = companyRepository.selectCompanyByName(companyName);
+
+//        for (Company company : companies) {
+//            if (company.getName().equalsIgnoreCase(companyName)){
+//                companyId = company.getCompanyId();
+//            }
+//        }
 
         Set<Loan> emptyList = new HashSet<>();
 
@@ -420,6 +431,8 @@ public class AdminService implements Service {
             Customer currentCustomer = new Customer(firstName, lastName, email, password, companyId, emptyList, address);
             customers.add(currentCustomer);
             csvFileWriter.writeToCustomerCsv(currentCustomer);
+            customerRepository.insertCustomer(firstName, lastName, email, password, companyId, address);
+            System.out.println("REGISTER SUCCESS");
         }
         else{
             System.out.println("There is no company with the name provided!");
@@ -429,6 +442,7 @@ public class AdminService implements Service {
     private void removeBookFromList(int idToRemove, AuditService audit) throws IOException {
         audit.writeActionToFile("RemoveBook");
         books.removeIf(x -> x.getId() == idToRemove);
+        bookRepository.deleteBook(idToRemove);
     }
 
     private void removeAudioBookFromList(int idToRemove, AuditService audit) throws IOException {
@@ -444,17 +458,27 @@ public class AdminService implements Service {
     private void removeCompany(int idToRemove, AuditService audit) throws IOException {
         audit.writeActionToFile("RemoveCompany");
         companies.removeIf(x -> x.getCompanyId() == idToRemove);
+        companyRepository.deleteCompany(idToRemove);
+    }
+
+    private void removeCustomer(int idToRemove, AuditService audit) throws IOException{
+        audit.writeActionToFile("RemoveCustomer");
+        customers.removeIf(x -> x.getUserId() == idToRemove);
+        customerRepository.deleteCustomer(idToRemove);
     }
 
     private void displayBooks(AuditService audit) throws IOException {
         audit.writeActionToFile("DisplayBooks");
 
-        BookNameComparator bookNameComparator = new BookNameComparator();
-        books.sort(bookNameComparator);
+        bookRepository.selectAllBooks();
 
-        for (Book book : books){
-            System.out.println(book);
-        }
+//        BookNameComparator bookNameComparator = new BookNameComparator();
+//        books.sort(bookNameComparator);
+//
+//        for (Book book : books){
+//            System.out.println(book);
+//        }
+//
     }
 
     private void displayAudiobooks(AuditService audit) throws IOException {
@@ -476,6 +500,8 @@ public class AdminService implements Service {
     private void displayCompanies(AuditService audit) throws IOException {
         audit.writeActionToFile("DisplayCompanies");
 
+        companyRepository.selectAllCompanies();
+
         for (Company company : companies){
             System.out.println(company);
         }
@@ -483,10 +509,38 @@ public class AdminService implements Service {
 
     public void displayCustomers(AuditService audit) throws IOException {
         audit.writeActionToFile("DisplayCustomers");
+        customerRepository.selectAllCustomers();
 
-        for (Customer customer : customers){
-            System.out.println(customer);
-        }
+//        for (Customer customer : customers){
+//            System.out.println(customer);
+//        }
+    }
+
+    public void updateTelephoneNumberCompany(Scanner scanner, AuditService audit) throws IOException {
+        audit.writeActionToFile("updateTelephoneNumberCompany");
+
+        System.out.println("Enter the id of the company");
+        int id = scanner.nextInt();
+
+        System.out.println("Enter the new telephone number of the company");
+        scanner.nextLine();
+        String telephoneNumber = scanner.nextLine();
+
+        companyRepository.updateTelephoneNumber(telephoneNumber, id);
+    }
+
+    public void updateNumberOfBooksAvailable(Scanner scanner, AuditService audit) throws IOException {
+        audit.writeActionToFile("updateNumberOfBooksAvailable");
+
+        System.out.println("Enter the id of the book");
+        int id = scanner.nextInt();
+
+        System.out.println("Enter the number of books available");
+        scanner.nextLine();
+        int numberOfBooksAvailable = scanner.nextInt();
+        scanner.nextLine();
+
+        bookRepository.updateNumberOfBooksAvailable(numberOfBooksAvailable, id);
     }
 
     @Override
@@ -504,10 +558,11 @@ public class AdminService implements Service {
                 System.out.println("\t -> Option 1 - Add items in the database ");
                 System.out.println("\t -> Option 2 - Remove items in the database ");
                 System.out.println("\t -> Option 3 - Display existing items ");
-                System.out.println("\t -> Option 4 - View available books ");
-                System.out.println("\t -> Option 5 - List all customers that have loans ");
-                System.out.println("\t -> Option 6 - List all books from a given publishing house ");
-                System.out.println("\t -> Option 7 - EXIT ");
+                System.out.println("\t -> Option 4 - Update existing items ");
+                System.out.println("\t -> Option 5 - View available books ");
+                System.out.println("\t -> Option 6 - List all customers that have loans ");
+                System.out.println("\t -> Option 7 - List all books from a given publishing house ");
+                System.out.println("\t -> Option 8 - EXIT ");
 
                 try {
                     option1 = scanner.nextInt();
@@ -562,6 +617,7 @@ public class AdminService implements Service {
                         System.out.println("\t -> Option 2 - AudioBook ");
                         System.out.println("\t -> Option 3 - EBook ");
                         System.out.println("\t -> Option 4 - Company ");
+                        System.out.println("\t -> Option 5 - Customer ");
 
                         try {
                             option3 = scanner.nextInt();
@@ -569,7 +625,7 @@ public class AdminService implements Service {
                         }
                         catch (Exception exception) {
                             scanner.nextLine();
-                            System.out.println("\t\tYou should enter a number 1-4");
+                            System.out.println("\t\tYou should enter a number 1-5");
                             System.out.println("\t !! Please Try Again");
                         }
                     }
@@ -582,6 +638,7 @@ public class AdminService implements Service {
                         case (2) -> removeAudioBookFromList(idToRemove, audit);
                         case (3) -> removeEBookFromList(idToRemove, audit);
                         case (4) -> removeCompany(idToRemove, audit);
+                        case (5) -> removeCustomer(idToRemove, audit);
                     }
                     break;
                 case (3):
@@ -618,18 +675,49 @@ public class AdminService implements Service {
                     System.out.println("\n");
                     break;
                 case (4):
-                    viewAvailableBooks(audit);
+                    // Update
+
+                    int option5;
+
+                    while (true) {
+                        System.out.println("\t What type of item do you want to update?");
+                        System.out.println("\t -> Option 1 - Number of Books Available");
+                        System.out.println("\t -> Option 2 - Number of Books AudioBooks Available");
+                        System.out.println("\t -> Option 3 - Number of Books EBooks Available");
+                        System.out.println("\t -> Option 4 - Companies Telephone Number");
+
+                        try {
+                            option5 = scanner.nextInt();
+                            scanner.nextLine();
+
+                            break;
+                        } catch (NumberFormatException exception) {
+                            scanner.nextLine();
+                            System.out.println("\t\tYou should enter a number 1-4");
+                            System.out.println("\t !! Please Try Again");
+                        }
+                    }
+
+                    switch (option5) {
+                        case (1) -> updateNumberOfBooksAvailable(scanner, audit);
+                        case (2) -> displayAudiobooks(audit);
+                        case (3) -> displayEBooks(audit);
+                        case (4) -> updateTelephoneNumberCompany(scanner, audit);
+                    }
                     break;
                 case (5):
-                    viewCustomersThatHaveLoans(audit);
+                    viewAvailableBooks(audit);
                     break;
                 case (6):
+                    viewCustomersThatHaveLoans(audit);
+                    break;
+                case (7):
                     scanner.nextLine();
                     System.out.println("Please type the name of the publishing house: ");
                     String publishingHouse = scanner.nextLine();
                     viewBooksFromGivenPublishingHouse(publishingHouse, audit);
                     break;
-                case (7):
+                case (8):
                     // Exit
                     System.out.println("Goodbye, " + username);
                     return;

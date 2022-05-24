@@ -264,6 +264,7 @@ public class AdminService implements Service {
         Audiobook currentAudioBook = new Audiobook(name, author, description, categoryOfTheBook, subcategoryOfTheBook, availability, duration);
         audiobooks.add(currentAudioBook);
         csvFileWriter.writeItemToCsv(currentAudioBook, Audiobook.class);
+        audiobookRepository.insertAudioBook(name, author, description, categoryOfTheBook, subcategoryOfTheBook, availability, duration);
     }
 
     private void addEBook(Scanner scanner, AuditService audit) throws IOException {
@@ -367,6 +368,7 @@ public class AdminService implements Service {
         EBook currentEBook = new EBook(name, author, description, categoryOfTheBook, subcategoryOfTheBook, availability, numberOfPages, format);
         ebooks.add(currentEBook);
         csvFileWriter.writeItemToCsv(currentEBook, EBook.class);
+        ebookRepository.insertEBook(name, author, description, categoryOfTheBook, subcategoryOfTheBook, availability, numberOfPages, format);
     }
 
     private void addCompany(Scanner scanner, AuditService audit) throws IOException {
@@ -448,11 +450,13 @@ public class AdminService implements Service {
     private void removeAudioBookFromList(int idToRemove, AuditService audit) throws IOException {
         audit.writeActionToFile("RemoveAudioBook");
         audiobooks.removeIf(x -> x.getId() == idToRemove);
+        audiobookRepository.deleteAudiobook(idToRemove);
     }
 
     private void removeEBookFromList(int idToRemove, AuditService audit) throws IOException {
         audit.writeActionToFile("RemoveEBook");
         ebooks.removeIf(x -> x.getId() == idToRemove);
+        ebookRepository.deleteEBook(idToRemove);
     }
 
     private void removeCompany(int idToRemove, AuditService audit) throws IOException {
@@ -469,7 +473,6 @@ public class AdminService implements Service {
 
     private void displayBooks(AuditService audit) throws IOException {
         audit.writeActionToFile("DisplayBooks");
-
         bookRepository.selectAllBooks();
 
 //        BookNameComparator bookNameComparator = new BookNameComparator();
@@ -483,28 +486,29 @@ public class AdminService implements Service {
 
     private void displayAudiobooks(AuditService audit) throws IOException {
         audit.writeActionToFile("DisplayAudiobooks");
+        audiobookRepository.selectAllAudioBooks();
 
-        for (Audiobook audiobook : audiobooks){
-            System.out.println(audiobook);
-        }
+//        for (Audiobook audiobook : audiobooks){
+//            System.out.println(audiobook);
+//        }
     }
 
     private void displayEBooks(AuditService audit) throws IOException {
         audit.writeActionToFile("DisplayEBooks");
+        ebookRepository.selectAllEbook();
 
-        for (EBook ebook : ebooks){
-            System.out.println(ebook);
-        }
+//        for (EBook ebook : ebooks){
+//            System.out.println(ebook);
+//        }
     }
 
     private void displayCompanies(AuditService audit) throws IOException {
         audit.writeActionToFile("DisplayCompanies");
-
         companyRepository.selectAllCompanies();
 
-        for (Company company : companies){
-            System.out.println(company);
-        }
+//        for (Company company : companies){
+//            System.out.println(company);
+//        }
     }
 
     public void displayCustomers(AuditService audit) throws IOException {
@@ -541,6 +545,41 @@ public class AdminService implements Service {
         scanner.nextLine();
 
         bookRepository.updateNumberOfBooksAvailable(numberOfBooksAvailable, id);
+    }
+
+    public void updateDurationAudiobook(Scanner scanner, AuditService audit) throws IOException {
+        audit.writeActionToFile("updateDurationAudiobook");
+
+        System.out.println("Enter the id of the audiobook");
+        int id = scanner.nextInt();
+        scanner.nextLine();
+
+        System.out.println("Enter the duration (in minutes): ");
+        int duration = scanner.nextInt();
+        scanner.nextLine();
+
+        audiobookRepository.updateDuration(duration, id);
+    }
+
+    public void updateFormatEBook(Scanner scanner, AuditService audit) throws IOException {
+        audit.writeActionToFile("updateFormatEBook");
+
+        System.out.println("Enter the id of the ebook");
+        int id = scanner.nextInt();
+        scanner.nextLine();
+        String format;
+
+        while (true){
+            System.out.println("Enter the new format of the ebook (pdf/kindle): ");
+            try {
+                format = scanner.nextLine();
+                break;
+            }
+            catch (Exception exception){
+                System.out.println("Please choose between pdf and kindle!");
+            }
+        }
+        ebookRepository.updateFormatEbook(format, id);
     }
 
     @Override
@@ -681,10 +720,10 @@ public class AdminService implements Service {
 
                     while (true) {
                         System.out.println("\t What type of item do you want to update?");
-                        System.out.println("\t -> Option 1 - Number of Books Available");
-                        System.out.println("\t -> Option 2 - Number of Books AudioBooks Available");
-                        System.out.println("\t -> Option 3 - Number of Books EBooks Available");
-                        System.out.println("\t -> Option 4 - Companies Telephone Number");
+                        System.out.println("\t -> Option 1 - Number of Books Available for a given book");
+                        System.out.println("\t -> Option 2 - Duration for a given audiobook");
+                        System.out.println("\t -> Option 3 - Format for a given ebook");
+                        System.out.println("\t -> Option 4 - The Telephone Number for a given company");
 
                         try {
                             option5 = scanner.nextInt();
@@ -700,8 +739,8 @@ public class AdminService implements Service {
 
                     switch (option5) {
                         case (1) -> updateNumberOfBooksAvailable(scanner, audit);
-                        case (2) -> displayAudiobooks(audit);
-                        case (3) -> displayEBooks(audit);
+                        case (2) -> updateDurationAudiobook(scanner, audit);
+                        case (3) -> updateFormatEBook(scanner, audit);
                         case (4) -> updateTelephoneNumberCompany(scanner, audit);
                     }
                     break;

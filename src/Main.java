@@ -176,7 +176,7 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         ReadFromCsvFileService csvFileReader = ReadFromCsvFileService.getInstance();
 
-//        createTables();
+//        createTables();  // se face o singura data la inceput
 
         CustomerService customerService = new CustomerService();
 

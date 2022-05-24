@@ -1,6 +1,6 @@
 package service;
 
-import dao.repository.CompanyRepository;
+import dao.repository.*;
 import entity.bookType.Audiobook;
 import entity.bookType.Book;
 import entity.bookType.BookType;
@@ -17,6 +17,11 @@ import java.util.*;
 
 public class ReadFromCsvFileService {
     public static ReadFromCsvFileService reader;
+    private static final CustomerRepository customerRepository = CustomerRepository.getCustomerRepository();
+    private static final CompanyRepository companyRepository = CompanyRepository.getCompanyRepository();
+    private static final AudiobookRepository audiobookRepository = AudiobookRepository.getAudiobookRepository();
+    private static final BookRepository bookRepository = BookRepository.getBookRepository();
+    private static final EbookRepository ebookRepository = EbookRepository.getEbookRepository();
 
     public static ReadFromCsvFileService getInstance(){
         if (reader == null){
@@ -106,6 +111,8 @@ public class ReadFromCsvFileService {
                 Customer currentCustomer = new Customer(firstName, lastName, email, password, companyId, emptyLoans, address);
 
                 customers.add(currentCustomer);
+//                customerRepository.insertCustomer(firstName, lastName, email, password, companyId, address);  // am inserat datele din csv in baza de date, se executa o singura data linia asta!
+
                 currentLine = bufferedReader.readLine();
             }
         }
@@ -135,6 +142,7 @@ public class ReadFromCsvFileService {
 
                Company currentCompany = new Company(companyName, address, telephoneNumber);
                companies.add(currentCompany);
+//               companyRepository.insertCompany(companyName, address, telephoneNumber);  // se executa o singura data
 
                currentLine = bufferedReader.readLine();
             }
@@ -171,6 +179,7 @@ public class ReadFromCsvFileService {
 
                     var currentAudiobook = new Audiobook(name, author, description, category, subcategory, availability, duration);
                     items.add(itemClass.cast(currentAudiobook));
+//                    audiobookRepository.insertAudioBook(name, author, description, category, subcategory, availability, duration);   // se executa o singura data
 
                     currentLine = bufferedReader.readLine();
                 }
@@ -201,6 +210,7 @@ public class ReadFromCsvFileService {
 
                     var currentBook = new Book(name, author, description, category, subcategory, availability, numberOfBooksAvailable, numberOfPages, coverType, publishingHouse);
                     items.add(itemClass.cast(currentBook));
+//                    bookRepository.insertBook(name, author, description, category, subcategory, availability, numberOfBooksAvailable, numberOfPages, coverType, publishingHouse);   // se executa o singura data
 
                     currentLine = bufferedReader.readLine();
                 }
@@ -230,6 +240,7 @@ public class ReadFromCsvFileService {
 
                     var currentEbook = new EBook(name, author, description, category, subcategory, availability, numberOfPages, format);
                     items.add(itemClass.cast(currentEbook));
+//                    ebookRepository.insertEBook(name, author, description, category, subcategory, availability, numberOfPages, format);   // se executa o singura data
 
                     currentLine = bufferedReader.readLine();
                 }

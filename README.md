@@ -10,10 +10,14 @@ This is a book lending project. Customers can borrow books, audiobooks or ebooks
 |        Add (Books, Ebooks, Audiobooks, Companies)         |     Register      |
 |       Remove (Books, Ebooks, Audiobooks, Companies)       |    Make a loan    |
 | Display (Books, Ebooks, Audiobooks, Companies, Customers) |   View profile    |
-|             viewBooksFromGivenPublishingHouse             | Display all loans |
-|                viewCustomersThatHaveLoans                 |  Change password  |
-|                    viewAvailableBooks                     |  Change username  |
-|                                                           | Review a product  |
+|          View Books From Given Publishing House           | Display all loans |
+|              View Customers That Have Loans               |  Change password  |
+|                   View Available Books                    |  Change username  |
+|     Update Number of Books Available for a given Book     | Review a product  |
+|           Update Duration for a given Audiobook           |                   |
+|              Update Format for a given Ebook              |                   |
+|        Update Telephone Number for a given Company        |                   |
+
 
 ## Objects:
 
@@ -29,9 +33,6 @@ This is a book lending project. Customers can borrow books, audiobooks or ebooks
 - Review
 - Category (enum)
 - Subcategory (enum)
-- Main
-- Admin Service
-- Customer Service
 
 ## Functions:
 - **Admin**
@@ -40,7 +41,11 @@ This is a book lending project. Customers can borrow books, audiobooks or ebooks
     - *Add Functions* (book, audiobook, ebook, company, customer)
     - *Remove Functions* (book, audiobook, ebook, company)
     - *Display Functions* (book, audiobook, ebook, company, customer)
----------------------
+    - *Update Functions* (book - number of books available, audiobook - duration, ebook - format, company - telephone number)
+    - Display customers that have loans
+    - Display customers from a given publishing house
+    - Display available books
+----------------------------------------------------------
 - **Customer**
     - Login
     - Menu (from Service Interface)
@@ -54,6 +59,33 @@ This is a book lending project. Customers can borrow books, audiobooks or ebooks
     - Change password
     - Change Username
     
+-----------------------------------------------------------
+
+- Implemented **CRUD** functions for 5 entities (Audiobook, Book, Company, Customer, EBook)
+  - **CREATE** - Insert functions
+  - **READ** - Select functions
+  - **UPDATE** - Update functions (duration, number of books available, telephone number, username, password, format)
+  - **DELETE** - Delete functions
+
+-----------------------------------------------------------
+
+# Application Interface in Intellij Console
+
+## Initial Display
+
+![](/src/screenshotsForReadme/InitialDisplay.png)
+
+## Admin Login and Menu
+
+![](/src/screenshotsForReadme/AdminLoginMenu.png)
+
+## Customer Register
+
+![](/src/screenshotsForReadme/CustomerRegister.png)
+
+## Customer Login and Menu
+
+![](/src/screenshotsForReadme/CustomerLogin.png)
 
 # Cerințe
 
@@ -96,4 +128,4 @@ Aplicația va conține:
 
 Înlocuiți serviciile realizate în etapa a II-a cu servicii care sa asigure persistenta utilizând baza de date folosind JDBC.
 
-- [ ] Să se realizeze servicii care sa expună operații de tip create, read, update si delete pentru cel puțin 4 dintre clasele definite.
+- [x] Să se realizeze servicii care sa expună operații de tip create, read, update si delete pentru cel puțin 4 dintre clasele definite.

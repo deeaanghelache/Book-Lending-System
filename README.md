@@ -10,9 +10,9 @@ This is a book lending project. Customers can borrow books, audiobooks or ebooks
 |        Add (Books, Ebooks, Audiobooks, Companies)         |     Register      |
 |       Remove (Books, Ebooks, Audiobooks, Companies)       |    Make a loan    |
 | Display (Books, Ebooks, Audiobooks, Companies, Customers) |   View profile    |
-|                                                           | Display all loans |
-|                                                           |  Change password  |
-|                                                           |  Change username  |
+|             viewBooksFromGivenPublishingHouse             | Display all loans |
+|                viewCustomersThatHaveLoans                 |  Change password  |
+|                    viewAvailableBooks                     |  Change username  |
 |                                                           | Review a product  |
 
 ## Objects:
@@ -77,13 +77,19 @@ Aplicația va conține:
 ### 1) Extindeți proiectul din prima etapa prin realizarea persistentei utilizând fișiere:
 
 
-- [ ] Se vor realiza fișiere de tip CSV pentru cel puțin 4 dintre clasele definite în prima etapa. Fiecare coloana din fișier este separata de virgula. Exemplu:nume,prenume,varsta
-- [ ] Se vor realiza servicii singleton generice pentru scrierea și citirea din fișiere;
-- [ ] La pornirea programului se vor încărca datele din fișiere utilizând serviciile create;
+- [x] Se vor realiza fișiere de tip CSV pentru cel puțin 4 dintre clasele definite în prima etapa. Fiecare coloana din fișier este separata de virgula. Exemplu:nume,prenume,varsta
+- [x] Se vor realiza servicii singleton generice pentru scrierea și citirea din fișiere;
+- [x] La pornirea programului se vor încărca datele din fișiere utilizând serviciile create;
 
 ### 2) Realizarea unui serviciu de audit
 
-- [ ] Se va realiza un serviciu care sa scrie într-un fișier de tip CSV de fiecare data când este executată una dintre acțiunile descrise în prima etapa. Structura fișierului: nume_actiune, timestamp
+- [x] Se va realiza un serviciu care sa scrie într-un fișier de tip CSV de fiecare data când este executată una dintre acțiunile descrise în prima etapa. Structura fișierului: nume_actiune, timestamp
+
+### 3) Din Barem:
+
+- [x] Streams
+- [x] Lambda Expresii
+- [x] Exceptii
 
 ## Etapa III - *Deadline 31 mai 2022*
 

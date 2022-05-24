@@ -1,17 +1,19 @@
 package service;
 
-import entity.bookType.Audiobook;
-import entity.bookType.Book;
-import entity.bookType.BookNameComparator;
-import entity.bookType.EBook;
+import dao.repository.*;
+import entity.bookType.*;
 import entity.category.Category;
 import entity.category.Subcategory;
 import entity.company.Company;
 import entity.loan.Loan;
 import entity.user.Admin;
 import entity.user.Customer;
+import entity.user.User;
+import exception.NumberOfPagesException;
 
+import java.io.IOException;
 import java.util.*;
+import java.util.function.Predicate;
 
 public class AdminService implements Service {
     private List<Book> books = new ArrayList<>();
@@ -19,6 +21,14 @@ public class AdminService implements Service {
     private List<EBook> ebooks = new ArrayList<>();
     private List<Company> companies = new ArrayList<>();
     private List<Customer> customers = new ArrayList<>();
+
+    private final WriteToCsvFileService csvFileWriter = WriteToCsvFileService.getInstance();
+
+    private static final CompanyRepository companyRepository = CompanyRepository.getCompanyRepository();
+    private static final CustomerRepository customerRepository = CustomerRepository.getCustomerRepository();
+    private static final AudiobookRepository audiobookRepository = AudiobookRepository.getAudiobookRepository();
+    private static final BookRepository bookRepository = BookRepository.getBookRepository();
+    private static final EbookRepository ebookRepository = EbookRepository.getEbookRepository();
 
     public AdminService() {}
 
@@ -30,7 +40,9 @@ public class AdminService implements Service {
         this.customers = customers;
     }
 
-    public void login(Scanner scanner, AdminService adminService, String username){
+    public void login(Scanner scanner, AdminService adminService, String username, AuditService audit) throws IOException {
+        audit.writeActionToFile("AdminLogin");
+
         scanner.nextLine();
         System.out.println("\n\t\t\t------------- ADMIN LOGIN -------------");
         Admin admin = Admin.getAdminInstance();
@@ -52,12 +64,15 @@ public class AdminService implements Service {
                 continue;
             }
             System.out.println("\t - You are now logged in as admin -");
-            menu(scanner, adminService, "admin");
+            menu(scanner, adminService, "admin", audit);
             break;
         }
     }
 
-    private void addBook(Scanner scanner){
+    private void addBook(Scanner scanner, AuditService audit) throws IOException {
+        audit.writeActionToFile("AddBook");
+        scanner.nextLine();
+
         System.out.println("Give the following information about a book: ");
 
         System.out.println("Name: ");
@@ -141,16 +156,34 @@ public class AdminService implements Service {
         System.out.println("Number of books available: ");
         int numberOfBooksAvailable = scanner.nextInt();
 
-        System.out.println("Number of pages: ");
-        int numberOfPages = scanner.nextInt();
+        int numberOfPages;
+
+        while(true){
+            System.out.println("Number of pages: ");
+
+            numberOfPages = scanner.nextInt();
+            try {
+                if (numberOfPages <= 0){
+                    throw new NumberOfPagesException("");
+                }
+                break;
+            }
+            catch (NumberOfPagesException exception){
+                System.out.println("The number of pages shouldn't be a negative number!");
+            }
+        }
 
         Book currentBook = new Book(name, author, description, categoryOfTheBook, subcategoryOfTheBook, availability, numberOfBooksAvailable, numberOfPages, coverType, publishingHouse);
         books.add(currentBook);
-
+        csvFileWriter.writeItemToCsv(currentBook, Book.class);
+        bookRepository.insertBook(name, author, description, categoryOfTheBook, subcategoryOfTheBook, availability, numberOfBooksAvailable, numberOfPages, coverType, publishingHouse);
 //        System.out.println(name + " " + description);
     }
 
-    private void addAudioBook(Scanner scanner){
+    private void addAudioBook(Scanner scanner, AuditService audit) throws IOException {
+        audit.writeActionToFile("AddAudioBook");
+        scanner.nextLine();
+
         System.out.println("Give the following information about an audiobook: ");
 
         System.out.println("Name: ");
@@ -230,9 +263,13 @@ public class AdminService implements Service {
 
         Audiobook currentAudioBook = new Audiobook(name, author, description, categoryOfTheBook, subcategoryOfTheBook, availability, duration);
         audiobooks.add(currentAudioBook);
+        csvFileWriter.writeItemToCsv(currentAudioBook, Audiobook.class);
     }
 
-    private void addEBook(Scanner scanner){
+    private void addEBook(Scanner scanner, AuditService audit) throws IOException {
+        audit.writeActionToFile("AddEBook");
+        scanner.nextLine();
+
         System.out.println("Give the following information about an eBook: ");
 
         System.out.println("Name: ");
@@ -310,14 +347,32 @@ public class AdminService implements Service {
         System.out.println("Format: ");
         String format = scanner.nextLine();
 
-        System.out.println("Number of pages: ");
-        int numberOfPages = scanner.nextInt();
+        int numberOfPages;
+
+        while(true){
+            System.out.println("Number of pages: ");
+
+            numberOfPages = scanner.nextInt();
+            try {
+                if (numberOfPages <= 0){
+                    throw new NumberOfPagesException("");
+                }
+                break;
+            }
+            catch (NumberOfPagesException exception){
+                System.out.println("The number of pages shouldn't be a negative number!");
+            }
+        }
 
         EBook currentEBook = new EBook(name, author, description, categoryOfTheBook, subcategoryOfTheBook, availability, numberOfPages, format);
         ebooks.add(currentEBook);
+        csvFileWriter.writeItemToCsv(currentEBook, EBook.class);
     }
 
-    private void addCompany(Scanner scanner){
+    private void addCompany(Scanner scanner, AuditService audit) throws IOException {
+        audit.writeActionToFile("AddCompany");
+        scanner.nextLine();
+
         System.out.println("Name: ");
         String name = scanner.nextLine();
 
@@ -329,10 +384,16 @@ public class AdminService implements Service {
 
         Company company = new Company(name, address, telephoneNumber);
         companies.add(company);
+        csvFileWriter.writeToCompanyCsv(company);
+
+        companyRepository.insertCompany(name, address, telephoneNumber);
     }
 
     // register
-    public void addCustomer(Scanner scanner){
+    public void addCustomer(Scanner scanner, AuditService audit) throws IOException {
+        audit.writeActionToFile("Register");
+//        scanner.nextLine();
+
         System.out.println();
         System.out.println("-------REGISTER--------");
 
@@ -356,157 +417,351 @@ public class AdminService implements Service {
         System.out.println("Company name: ");
         String companyName = scanner.nextLine();
 
-        int companyId = 0;
-        for (Company company : companies) {
-            if (company.getName().toUpperCase().equals(companyName.toUpperCase())){
-                companyId = company.getCompanyId();
-            }
-        }
+        int companyId = companyRepository.selectCompanyByName(companyName);
+
+//        for (Company company : companies) {
+//            if (company.getName().equalsIgnoreCase(companyName)){
+//                companyId = company.getCompanyId();
+//            }
+//        }
 
         Set<Loan> emptyList = new HashSet<>();
 
         if (companyId != 0){
             Customer currentCustomer = new Customer(firstName, lastName, email, password, companyId, emptyList, address);
             customers.add(currentCustomer);
-//            System.out.println(currentCustomer);
+            csvFileWriter.writeToCustomerCsv(currentCustomer);
+            customerRepository.insertCustomer(firstName, lastName, email, password, companyId, address);
+            System.out.println("REGISTER SUCCESS");
         }
         else{
             System.out.println("There is no company with the name provided!");
         }
     }
 
-    private void removeBookFromList(int idToRemove){
+    private void removeBookFromList(int idToRemove, AuditService audit) throws IOException {
+        audit.writeActionToFile("RemoveBook");
         books.removeIf(x -> x.getId() == idToRemove);
+        bookRepository.deleteBook(idToRemove);
     }
 
-    private void removeAudioBookFromList(int idToRemove){
+    private void removeAudioBookFromList(int idToRemove, AuditService audit) throws IOException {
+        audit.writeActionToFile("RemoveAudioBook");
         audiobooks.removeIf(x -> x.getId() == idToRemove);
     }
 
-    private void removeEBookFromList(int idToRemove){
+    private void removeEBookFromList(int idToRemove, AuditService audit) throws IOException {
+        audit.writeActionToFile("RemoveEBook");
         ebooks.removeIf(x -> x.getId() == idToRemove);
     }
 
-    private void removeCompany(int idToRemove){
+    private void removeCompany(int idToRemove, AuditService audit) throws IOException {
+        audit.writeActionToFile("RemoveCompany");
         companies.removeIf(x -> x.getCompanyId() == idToRemove);
+        companyRepository.deleteCompany(idToRemove);
     }
 
-    private void displayBooks(){
-        BookNameComparator bookNameComparator = new BookNameComparator();
-        books.sort(bookNameComparator);
-
-        for (Book book : books){
-            System.out.println(book);
-        }
+    private void removeCustomer(int idToRemove, AuditService audit) throws IOException{
+        audit.writeActionToFile("RemoveCustomer");
+        customers.removeIf(x -> x.getUserId() == idToRemove);
+        customerRepository.deleteCustomer(idToRemove);
     }
 
-    private void displayAudiobooks(){
+    private void displayBooks(AuditService audit) throws IOException {
+        audit.writeActionToFile("DisplayBooks");
+
+        bookRepository.selectAllBooks();
+
+//        BookNameComparator bookNameComparator = new BookNameComparator();
+//        books.sort(bookNameComparator);
+//
+//        for (Book book : books){
+//            System.out.println(book);
+//        }
+//
+    }
+
+    private void displayAudiobooks(AuditService audit) throws IOException {
+        audit.writeActionToFile("DisplayAudiobooks");
+
         for (Audiobook audiobook : audiobooks){
             System.out.println(audiobook);
         }
     }
 
-    private void displayEBooks(){
+    private void displayEBooks(AuditService audit) throws IOException {
+        audit.writeActionToFile("DisplayEBooks");
+
         for (EBook ebook : ebooks){
             System.out.println(ebook);
         }
     }
 
-    private void displayCompanies(){
+    private void displayCompanies(AuditService audit) throws IOException {
+        audit.writeActionToFile("DisplayCompanies");
+
+        companyRepository.selectAllCompanies();
+
         for (Company company : companies){
             System.out.println(company);
         }
     }
 
-    public void displayCustomers(){
-        for (Customer customer : customers){
-            System.out.println(customer);
-        }
+    public void displayCustomers(AuditService audit) throws IOException {
+        audit.writeActionToFile("DisplayCustomers");
+        customerRepository.selectAllCustomers();
+
+//        for (Customer customer : customers){
+//            System.out.println(customer);
+//        }
+    }
+
+    public void updateTelephoneNumberCompany(Scanner scanner, AuditService audit) throws IOException {
+        audit.writeActionToFile("updateTelephoneNumberCompany");
+
+        System.out.println("Enter the id of the company");
+        int id = scanner.nextInt();
+
+        System.out.println("Enter the new telephone number of the company");
+        scanner.nextLine();
+        String telephoneNumber = scanner.nextLine();
+
+        companyRepository.updateTelephoneNumber(telephoneNumber, id);
+    }
+
+    public void updateNumberOfBooksAvailable(Scanner scanner, AuditService audit) throws IOException {
+        audit.writeActionToFile("updateNumberOfBooksAvailable");
+
+        System.out.println("Enter the id of the book");
+        int id = scanner.nextInt();
+
+        System.out.println("Enter the number of books available");
+        scanner.nextLine();
+        int numberOfBooksAvailable = scanner.nextInt();
+        scanner.nextLine();
+
+        bookRepository.updateNumberOfBooksAvailable(numberOfBooksAvailable, id);
     }
 
     @Override
-    public void menu(Scanner scanner, AdminService admin, String username) {
+    public void menu(Scanner scanner, AdminService admin, String username, AuditService audit) throws IOException {
+        audit.writeActionToFile("AdminMenu");
+
         System.out.println("\n\t\t\t------------- ADMIN MENU -------------");
 
         while(true){
-            System.out.println("\t Please choose what you want to do: ");
-            System.out.println("\t -> Option 1 - Add items in the database ");
-            System.out.println("\t -> Option 2 - Remove items in the database ");
-            System.out.println("\t -> Option 3 - Display existing items ");
-            System.out.println("\t -> Option 4 - EXIT ");
 
-            int option1 = scanner.nextInt();
+            int option1;
+
+            while (true){
+                System.out.println("\t Please choose what you want to do: ");
+                System.out.println("\t -> Option 1 - Add items in the database ");
+                System.out.println("\t -> Option 2 - Remove items in the database ");
+                System.out.println("\t -> Option 3 - Display existing items ");
+                System.out.println("\t -> Option 4 - Update existing items ");
+                System.out.println("\t -> Option 5 - View available books ");
+                System.out.println("\t -> Option 6 - List all customers that have loans ");
+                System.out.println("\t -> Option 7 - List all books from a given publishing house ");
+                System.out.println("\t -> Option 8 - EXIT ");
+
+                try {
+                    option1 = scanner.nextInt();
+                    break;
+                }
+                catch (Exception exception) {
+                    scanner.nextLine();
+                    System.out.println("\t\tYou should enter a number 1-7");
+                    System.out.println("\t !! Please Try Again");
+                }
+            }
 
             switch (option1) {
                 case (1):
                     // Add
 
-                    System.out.println("\t What type of item do you want to add?");
-                    System.out.println("\t -> Option 1 - Book ");
-                    System.out.println("\t -> Option 2 - AudioBook ");
-                    System.out.println("\t -> Option 3 - EBook ");
-                    System.out.println("\t -> Option 4 - Company ");
+                    int option2;
 
-                    int option2 = scanner.nextInt();
-                    scanner.nextLine();
+                    while (true){
+                        System.out.println("\t What type of item do you want to add?");
+                        System.out.println("\t -> Option 1 - Book ");
+                        System.out.println("\t -> Option 2 - AudioBook ");
+                        System.out.println("\t -> Option 3 - EBook ");
+                        System.out.println("\t -> Option 4 - Company ");
+
+                        try {
+                            option2 = scanner.nextInt();
+                            break;
+                        }
+                        catch (Exception exception) {
+                            scanner.nextLine();
+                            System.out.println("\t\tYou should enter a number 1-4");
+                            System.out.println("\t !! Please Try Again");
+                        }
+                    }
 
                     switch (option2) {
-                        case (1) -> addBook(scanner);
-                        case (2) -> addAudioBook(scanner);
-                        case (3) -> addEBook(scanner);
-                        case (4) -> addCompany(scanner);
+                        case (1) -> addBook(scanner, audit);
+                        case (2) -> addAudioBook(scanner, audit);
+                        case (3) -> addEBook(scanner, audit);
+                        case (4) -> addCompany(scanner, audit);
                     }
                     break;
                 case (2):
                     // Remove
 
-                    System.out.println("\t What type of item do you want to remove?");
-                    System.out.println("\t -> Option 1 - Book ");
-                    System.out.println("\t -> Option 2 - AudioBook ");
-                    System.out.println("\t -> Option 3 - EBook ");
-                    System.out.println("\t -> Option 4 - Company ");
+                    int option3;
 
-                    int option3 = scanner.nextInt();
-                    scanner.nextLine();
+                    while (true){
+                        System.out.println("\t What type of item do you want to remove?");
+                        System.out.println("\t -> Option 1 - Book ");
+                        System.out.println("\t -> Option 2 - AudioBook ");
+                        System.out.println("\t -> Option 3 - EBook ");
+                        System.out.println("\t -> Option 4 - Company ");
+                        System.out.println("\t -> Option 5 - Customer ");
+
+                        try {
+                            option3 = scanner.nextInt();
+                            break;
+                        }
+                        catch (Exception exception) {
+                            scanner.nextLine();
+                            System.out.println("\t\tYou should enter a number 1-5");
+                            System.out.println("\t !! Please Try Again");
+                        }
+                    }
 
                     System.out.println("\t Please, enter the id of the item you want to remove: ");
                     int idToRemove = scanner.nextInt();
 
                     switch (option3) {
-                        case (1) -> removeBookFromList(idToRemove);
-                        case (2) -> removeAudioBookFromList(idToRemove);
-                        case (3) -> removeEBookFromList(idToRemove);
-                        case (4) -> removeCompany(idToRemove);
+                        case (1) -> removeBookFromList(idToRemove, audit);
+                        case (2) -> removeAudioBookFromList(idToRemove, audit);
+                        case (3) -> removeEBookFromList(idToRemove, audit);
+                        case (4) -> removeCompany(idToRemove, audit);
+                        case (5) -> removeCustomer(idToRemove, audit);
                     }
                     break;
                 case (3):
                     // Display
 
-                    System.out.println("\t What type of item do you want to display?");
-                    System.out.println("\t -> Option 1 - Books ");
-                    System.out.println("\t -> Option 2 - AudioBooks ");
-                    System.out.println("\t -> Option 3 - EBooks ");
-                    System.out.println("\t -> Option 4 - Companies ");
-                    System.out.println("\t -> Option 5 - Customers ");
+                    int option4;
 
-                    int option4 = scanner.nextInt();
-                    scanner.nextLine();
+                    while (true){
+                        System.out.println("\t What type of item do you want to display?");
+                        System.out.println("\t -> Option 1 - Books ");
+                        System.out.println("\t -> Option 2 - AudioBooks ");
+                        System.out.println("\t -> Option 3 - EBooks ");
+                        System.out.println("\t -> Option 4 - Companies ");
+                        System.out.println("\t -> Option 5 - Customers ");
+
+                        try {
+                            option4 = scanner.nextInt();
+                            break;
+                        }
+                        catch (NumberFormatException exception) {
+                            scanner.nextLine();
+                            System.out.println("\t\tYou should enter a number 1-5");
+                            System.out.println("\t !! Please Try Again");
+                        }
+                    }
 
                     switch (option4) {
-                        case (1) -> displayBooks();
-                        case (2) -> displayAudiobooks();
-                        case (3) -> displayEBooks();
-                        case (4) -> displayCompanies();
-                        case (5) -> displayCustomers();
+                        case (1) -> displayBooks(audit);
+                        case (2) -> displayAudiobooks(audit);
+                        case (3) -> displayEBooks(audit);
+                        case (4) -> displayCompanies(audit);
+                        case (5) -> displayCustomers(audit);
                     }
                     System.out.println("\n");
                     break;
                 case (4):
+                    // Update
+
+                    int option5;
+
+                    while (true) {
+                        System.out.println("\t What type of item do you want to update?");
+                        System.out.println("\t -> Option 1 - Number of Books Available");
+                        System.out.println("\t -> Option 2 - Number of Books AudioBooks Available");
+                        System.out.println("\t -> Option 3 - Number of Books EBooks Available");
+                        System.out.println("\t -> Option 4 - Companies Telephone Number");
+
+                        try {
+                            option5 = scanner.nextInt();
+                            scanner.nextLine();
+
+                            break;
+                        } catch (NumberFormatException exception) {
+                            scanner.nextLine();
+                            System.out.println("\t\tYou should enter a number 1-4");
+                            System.out.println("\t !! Please Try Again");
+                        }
+                    }
+
+                    switch (option5) {
+                        case (1) -> updateNumberOfBooksAvailable(scanner, audit);
+                        case (2) -> displayAudiobooks(audit);
+                        case (3) -> displayEBooks(audit);
+                        case (4) -> updateTelephoneNumberCompany(scanner, audit);
+                    }
+                    break;
+                case (5):
+                    viewAvailableBooks(audit);
+                    break;
+                case (6):
+                    viewCustomersThatHaveLoans(audit);
+                    break;
+                case (7):
+                    scanner.nextLine();
+                    System.out.println("Please type the name of the publishing house: ");
+                    String publishingHouse = scanner.nextLine();
+                    viewBooksFromGivenPublishingHouse(publishingHouse, audit);
+                    break;
+                case (8):
                     // Exit
                     System.out.println("Goodbye, " + username);
                     return;
             }
         }
+    }
+
+    public void viewAvailableBooks(AuditService audit) throws IOException {
+        audit.writeActionToFile("ViewAvailableBooks");
+        List<String> availableBooks = new ArrayList<>();
+
+        Predicate<Book> bookPredicate = book -> book.getNumberOfBooksAvailable() > 0;
+        for (Book book : books){
+            if (bookPredicate.test(book)){
+                availableBooks.add(book.getName());
+            }
+        }
+
+        System.out.println("\tAvailable Books:\n");
+        for (String name : availableBooks){
+            System.out.println("\t\t - " + name);
+        }
+    }
+
+    public void viewCustomersThatHaveLoans(AuditService audit) throws IOException {
+        audit.writeActionToFile("ViewCustomersThatHaveLoans");
+
+        var customersWithLoans = customers;
+        customersWithLoans
+                .stream()
+                .filter(x -> !x.getLoans().isEmpty())
+                .map(User::getEmailAddress)
+                .forEach(System.out::println);
+    }
+
+    public void viewBooksFromGivenPublishingHouse(String publishingHouse, AuditService audit) throws IOException {
+        audit.writeActionToFile("ViewBooksFromGivenPublishingHouse");
+
+        var booksStream = books;
+        booksStream
+                .stream()
+                .filter(x -> x.getPublishingHouse().equalsIgnoreCase(publishingHouse))
+                .map(BookType::getName)
+                .forEach(System.out::println);
     }
 
     public List<Book> getBooks() {

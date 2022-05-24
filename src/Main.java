@@ -1,3 +1,5 @@
+import dao.configuration.DatabaseConfiguration;
+import dao.repository.*;
 import entity.bookType.Audiobook;
 import entity.bookType.Book;
 import entity.bookType.EBook;
@@ -6,23 +8,23 @@ import entity.category.Subcategory;
 import entity.company.Company;
 import entity.loan.Loan;
 import entity.user.Customer;
-import service.AdminService;
-import service.CustomerService;
+import service.*;
 
+import java.io.IOException;
 import java.util.*;
 
 public class Main {
 
     static List<Book> booksDatabase(){
         Book book1 = new Book("Iernile Sufletului", "Katherine May", "Descriere", Category.NONFICTION, Subcategory.SELFHELP, "available", 30, 300, "Paperback", "Nemira");
-        Book book2 = new Book("Cascada Ingerilor", "Kristin Hannah", "Descriere", Category.FICTION, Subcategory.ROMANCE, "available", 1, 300, "Paperback", "Litera");
-        Book book3 = new Book("Calatoria Cilkai", "Heather Morris", "Descriere", Category.FICTION, Subcategory.HISTORICALFICTION, "available", 30, 300, "Paperback", "Humanitas");
-        Book book4 = new Book("Modelul din Paris", "Alexandra Joel", "Descriere", Category.FICTION, Subcategory.HISTORICALFICTION, "available", 10, 400, "Paperback", "Nemira");
+        Book book2 = new Book("Cascada Ingerilor", "Kristin Hannah", "Descriere", Category.FICTION, Subcategory.ROMANCE, "available", 0, 300, "Paperback", "Litera");
+        Book book3 = new Book("Calatoria Cilkai", "Heather Morris", "Descriere", Category.FICTION, Subcategory.HISTORICALFICTION, "available", 0, 300, "Paperback", "Humanitas");
+        Book book4 = new Book("Modelul din Paris", "Alexandra Joel", "Descriere", Category.FICTION, Subcategory.HISTORICALFICTION, "available", 0, 400, "Paperback", "Nemira");
         Book book5 = new Book("Troia", "Stephen Fry", "Descriere", Category.NONFICTION, Subcategory.HISTORY, "available", 11, 200, "Paperback", "Trei");
         Book book6 = new Book("Ganduri catre sine insusi", "Marcus Aurelius", "Descriere", Category.NONFICTION, Subcategory.BIOGRAPHY, "not available", 0, 180, "Paperback", "Humanitas");
         Book book7 = new Book("Nepovestitele iubiri", "Tatiana Niculescu", "Descriere", Category.FICTION, Subcategory.ROMANCE, "available", 12, 210, "Paperback", "Humanitas");
         Book book8 = new Book("O scurta istorie ilustrata a romanilor", "Neagu Djuvara", "Descriere", Category.NONFICTION, Subcategory.HISTORY, "available", 30, 300, "Paperback", "Humanitas");
-        Book book9 = new Book("Privighetoarea", "Kristin Hannah", "Descriere", Category.FICTION, Subcategory.ROMANCE, "available", 3, 500, "Paperback", "Litera");
+        Book book9 = new Book("Privighetoarea", "Kristin Hannah", "Descriere", Category.FICTION, Subcategory.ROMANCE, "available", 1, 500, "Paperback", "Litera");
         Book book10 = new Book("Hopeless", "Colleen Hoover", "Descriere", Category.FICTION, Subcategory.ROMANCE, "available", 10, 400, "Paperback", "Epica");
 
         List<Book> books = new ArrayList<>();
@@ -85,79 +87,117 @@ public class Main {
         return customers;
     }
 
-    static void initialDisplay(Scanner scanner, AdminService admin, CustomerService customerService){
-        System.out.println("********** WELCOME TO MY BOOK LENDING PROJECT **********");
-        System.out.println("\tPlease tell us if you are an admin or a customer by typing one of the 2 options:");
-        System.out.println("\t * Option 1 - Admin");
-        System.out.println("\t * Option 2 - Customer");
+    static void initialDisplay(Scanner scanner, AdminService admin, CustomerService customerService, AuditService audit) throws IOException {
+        {
+            while(true)
+            {
+                System.out.println("********** WELCOME TO MY BOOK LENDING PROJECT **********");
 
-        int option = scanner.nextInt();
+                int option;
 
-        if (option == 1) {
-            System.out.println("\t\t Welcome, admin! Please login in order to continue: ");
-            admin.login(scanner, admin, "admin");
-        }
-        else{
-            System.out.println("\t\t Welcome, customer! Do you have an account?");
-            System.out.println("\t * Option 1 - Yes");
-            System.out.println("\t * Option 2 - No");
+                while (true) {
+                    System.out.println("\tPlease tell us if you are an admin, a customer or you want to exit by typing one of the 3 options:");
+                    System.out.println("\t * Option 1 - Admin");
+                    System.out.println("\t * Option 2 - Customer");
+                    System.out.println("\t * Option 3 - Exit");
 
-            int response = scanner.nextInt();
-            if (response == 1){
-                scanner.nextLine();
-                System.out.println("\t Please login in order to continue: ");
-                customerService.login(scanner, admin);
-            }
-            else {
-                if (response == 2){
-                    scanner.nextLine();
-                    admin.addCustomer(scanner);
+                    try {
+                        option = scanner.nextInt();
+                        break;
+                    } catch (Exception exception) {
+                        scanner.nextLine();
+                        System.out.println("\t\tYou should enter a number 1-3");
+                        System.out.println("\t !! Please Try Again");
+                    }
+                }
 
-                    System.out.println("Please wait, we're REDIRECTING you to LOGIN");
-                    customerService.login(scanner, admin);
+                if (option == 1) {
+                    System.out.println("\t\t Welcome, admin! Please login in order to continue: ");
+                    admin.login(scanner, admin, "admin", audit);
+                } else if (option == 2){
+                    int response;
+
+                    while (true) {
+                        System.out.println("\t\t Welcome, customer! Do you have an account?");
+                        System.out.println("\t * Option 1 - Yes");
+                        System.out.println("\t * Option 2 - No");
+
+                        try {
+                            response = scanner.nextInt();
+                            break;
+                        } catch (Exception exception) {
+                            scanner.nextLine();
+                            System.out.println("\t\tYou should enter a number 1-2");
+                            System.out.println("\t !! Please Try Again");
+                        }
+                    }
+
+                    if (response == 1) {
+                        scanner.nextLine();
+                        System.out.println("\t Please login in order to continue: ");
+                        customerService.login(scanner, admin, audit);
+                    } else {
+                        if (response == 2) {
+                            scanner.nextLine();
+                            admin.addCustomer(scanner, audit);
+
+                            System.out.println("Please wait, we're REDIRECTING you to LOGIN");
+                            customerService.login(scanner, admin, audit);
+                        }
+                    }
+                }
+                else {
+                    break;
                 }
             }
         }
     }
 
-    public static void main(String[] args) {
+    static void createTables(){
+        CustomerRepository customerRepository = CustomerRepository.getCustomerRepository();
+        customerRepository.createTable();
+
+        AudiobookRepository audiobookRepository = AudiobookRepository.getAudiobookRepository();
+        audiobookRepository.createTable();
+
+        BookRepository bookRepository = BookRepository.getBookRepository();
+        bookRepository.createTable();
+
+        CompanyRepository companyRepository = CompanyRepository.getCompanyRepository();
+        companyRepository.createTable();
+
+        EbookRepository ebookRepository = EbookRepository.getEbookRepository();
+        ebookRepository.createTable();
+
+    }
+
+    public static void main(String[] args) throws IOException {
 
         Scanner scanner = new Scanner(System.in);
+        ReadFromCsvFileService csvFileReader = ReadFromCsvFileService.getInstance();
+
+//        createTables();
 
         CustomerService customerService = new CustomerService();
 
-        var books = booksDatabase();
-        var audiobooks = audiobooksDatabase();
-        var ebooks = ebooksDatabase();
-        var companies = companiesDatabase();
-        var customers = customersDatabase();
+        var customers = csvFileReader.readCustomersFromCsv();
+        var companies = csvFileReader.readCompaniesFromCsv();
+        var books = csvFileReader.readItems(Book.class);
+        var audiobooks = csvFileReader.readItems(Audiobook.class);
+        var ebooks = csvFileReader.readItems(EBook.class);
 
         AdminService admin = new AdminService(books, audiobooks, ebooks, companies, customers);
+        AuditService audit = new AuditService();
+        initialDisplay(scanner, admin, customerService, audit);
 
-        initialDisplay(scanner, admin, customerService);
+        /*
+            var books = booksDatabase();
+            var audiobooks = audiobooksDatabase();
+            var ebooks = ebooksDatabase();
+            var companies = companiesDatabase();
+            var customers = customersDatabase();
+        */
 
-        /* Display items from databases */
-//        admin.displayBooks();
-//        admin.displayEBooks();
-//        admin.displayAudiobooks();
-//        admin.displayCompanies();
-
-        // TESTS FOR AddCustomer
-
-//        admin.addCustomer(scanner);
-//        admin.addCustomer(scanner);
-//        admin.displayCustomers();
-
-//        customers = admin.getCustomers();
-//
-//        for (user.Customer customer : customers) {
-//            var username = customer.getEmailAddress();
-//            customerService.addLoan(username, admin);
-//            System.out.println("This is the loan made by user: " + username.toUpperCase() + "\n" + customer.getLoans());
-//        }
-//
-//        System.out.println("These are all the loans: ");
-////        customerService.displayAllLoans();
-//        customerService.addLoan("username", admin);
+        DatabaseConfiguration.closeDatabaseConfiguration();
     }
 }

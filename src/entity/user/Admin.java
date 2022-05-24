@@ -4,7 +4,7 @@ public class Admin extends User{
     private static Admin admin;
 
     private Admin() {
-        super(1, "Cristina", "Ionita", "admin", "adminpa55");
+        super("Cristina", "Ionita", "admin", "adminpa55");
     }
 
     public static Admin getAdminInstance(){

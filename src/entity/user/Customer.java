@@ -1,19 +1,23 @@
 package entity.user;
 
+import dao.repository.CustomerRepository;
 import entity.loan.Loan;
+import service.AuditService;
 
 import java.util.Scanner;
 import java.util.Set;
 
 public class Customer extends User{
-    private static int customerNumber = 2; // Admin has id = 1
+//    private static int customerNumber = 2; // Admin has id = 1
     private Set<Loan> loans;
     private String address;
     protected int companyId;
 
+    private CustomerRepository customerRepository = CustomerRepository.getCustomerRepository();
+
     public Customer(String firstName, String lastName, String emailAddress, String password, int companyId, Set<Loan> loans, String address) {
-        super(customerNumber, firstName, lastName, emailAddress, password);
-        customerNumber++;
+        super(firstName, lastName, emailAddress, password);
+//        customerNumber++;
         this.loans = loans;
         this.address = address;
         this.companyId = companyId;
@@ -75,16 +79,18 @@ public class Customer extends User{
     }
 
 
-    public String changeUsername(Scanner scanner){
+    public String changeUsername(Scanner scanner, AuditService audit){
         scanner.nextLine();
+        String oldUsername = this.emailAddress;
         System.out.println("Enter the new username: ");
         String newUsername = scanner.nextLine();
 
         this.setEmailAddress(newUsername);
+        customerRepository.updateUsername(newUsername, oldUsername);
         return newUsername;
     }
 
-    public void changePassword(Scanner scanner){
+    public void changePassword(Scanner scanner, AuditService audit){
         scanner.nextLine();
         System.out.println("Enter the new password: ");
         String newPassword = scanner.nextLine();
@@ -94,6 +100,7 @@ public class Customer extends User{
         if (newPassword.equals(duplicate))
         {
             this.setPassword(newPassword);
+            customerRepository.updatePassword(newPassword, this.emailAddress);
             System.out.println("Your password has been successfully changed! ");
         }
         else {

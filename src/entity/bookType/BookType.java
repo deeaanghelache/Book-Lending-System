@@ -3,6 +3,7 @@ package entity.bookType;
 import entity.category.Category;
 import entity.category.Subcategory;
 import entity.review.Review;
+import service.AuditService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +17,15 @@ public abstract class BookType{
     protected Category category;
     protected Subcategory subcategory;
     protected List<Review> reviews = new ArrayList<>();
+
+    public BookType(String name, String author, String description, Category category, Subcategory subcategory, String availability) {
+        this.name = name;
+        this.author = author;
+        this.description = description;
+        this.category = category;
+        this.subcategory = subcategory;
+        this.availability = availability;
+    }
 
     public BookType(int id, String name, String author, String description, Category category, Subcategory subcategory, String availability) {
         this.id = id;
@@ -31,7 +41,7 @@ public abstract class BookType{
 
     abstract public void setAvailability(String availability);
 
-    public void addReview(Review review){
+    public void addReview(Review review, AuditService audit){
         this.reviews.add(review);
     }
 

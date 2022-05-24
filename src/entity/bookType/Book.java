@@ -12,7 +12,7 @@ public class Book extends BookType{
 
 
     public Book(String name, String author, String description, Category category, Subcategory subcategory, String availability, int numberOfBooksAvailable, int numberOfPages, String coverType, String publishingHouse) {
-        super(booksNumber, name, author, description, category, subcategory, availability);
+        super(name, author, description, category, subcategory, availability);
         booksNumber++;
         this.numberOfBooksAvailable = numberOfBooksAvailable;
         this.numberOfPages = numberOfPages;
@@ -42,7 +42,7 @@ public class Book extends BookType{
                 "\n\t\t -> numberOfPages = " + numberOfPages +
                 "\n\t\t -> coverType = " + coverType +
                 "\n\t\t -> publishingHouse = " + publishingHouse +
-                "\n\t\t -> reviews: " + reviews;
+                "\n\t\t -> reviews: " + reviews + "\n";
     }
 
     public int getNumberOfBooksAvailable() {

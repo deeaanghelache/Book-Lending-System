@@ -1,11 +1,18 @@
 package entity.user;
 
 public abstract class User {
-    protected final int userId;
+    protected int userId;
     protected String firstName;
     protected String lastName;
     protected String emailAddress;
     protected String password;
+
+    public User(String firstName, String lastName, String emailAddress, String password) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.emailAddress = emailAddress;
+        this.password = password;
+    }
 
     public User(int userId, String firstName, String lastName, String emailAddress, String password) {
         this.userId = userId;
